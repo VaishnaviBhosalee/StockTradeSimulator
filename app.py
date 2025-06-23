@@ -1,5 +1,5 @@
-
-# app.py  (single-file version)
+from create_app import app
+from extensions import db
 from flask import Flask, request, jsonify, render_template
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
@@ -10,10 +10,6 @@ load_dotenv()                           # reads .env
 ALPHA_KEY = os.getenv("ALPHA_KEY")
 BASE_URL  = "https://www.alphavantage.co/query"
 
-# ---- create app & DB ---------------------------------------------
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
-db = SQLAlchemy(app)
 
 # ---- ROUTES -------------------------------------------------------
 @app.route('/')
