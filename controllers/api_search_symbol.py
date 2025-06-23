@@ -1,18 +1,29 @@
-from flask import render_template,redirect
-from create_app import app
-from extensions import db
-import requests, os
+# controllers/api_search_symbol.py
+
+from flask import request, jsonify
+import requests
+import os
+from create_app import app  # import the central app instance
+
+# Load API key and URL
+ALPHA_KEY = os.getenv("ALPHA_KEY")
+BASE_URL  = "https://www.alphavantage.co/query"
 
 @app.route('/api/search')
 def search_symbol():
-    q = request.args.get("q", "")
-    r = requests.get(BASE_URL, params={
+    query = request.args.get("q", "")
+    if not query:
+        return jsonify({"error": "No query provided"}), 400
+
+    params = {
         "function": "SYMBOL_SEARCH",
-        "keywords": q,
-        "apikey": os.getenv("ALPHA_KEY")
-    }, timeout=10)
-    matches = r.json().get("bestMatches", [])[:10]
-    return jsonify([
-        {"symbol": m["1. symbol"], "name": m["2. name"], "region": m["4. region"]}
-        for m in matches
-    ])
+        "keywords": query,
+        "apikey": ALPHA_KEY
+    }
+
+    try:
+        response = requests.get(BASE_URL, params=params)
+        data = response.json()
+        return jsonify(data.get("bestMatches", []))
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

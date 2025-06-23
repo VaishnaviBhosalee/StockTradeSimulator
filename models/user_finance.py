@@ -1,7 +1,7 @@
 from extensions import db
 
 
-class Finance(db.Model):
+class UserFinance(db.Model):
     __tablename__='finances'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer,db.ForeignKey('users.id',ondelete='CASCADE'))
