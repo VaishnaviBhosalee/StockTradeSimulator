@@ -9,7 +9,9 @@
     <form action="/login" method="POST">
 
       {% if login_success1 %}
-      <alert> User not found </alert>
+      <div class="alert alert-primary width-80" role="alert">
+        User not found. Please Register
+      </div>
       {% endif %}
 
     <h2>Login page</h2>
@@ -23,6 +25,7 @@
 </div>
 
 <button type="submit" class="btn btn-danger">Login</button>
+<br> <br>
 <a href="/register" style="color: orangered; margin: 5px;">Register here!</a>
 </div>
 

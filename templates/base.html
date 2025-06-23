@@ -19,7 +19,6 @@
     <div class="collapse navbar-collapse " id="navbarSupportedContent">
       {% if login_success %}
       <h2> Welcome, {{user_name}} </h2>
-      {% endif %}
       
       <ul class="navbar-nav me-auto mb-2 mb-lg-0 mx-auto">
 
@@ -59,7 +58,19 @@
           <a class="nav-link" href="/leaderboard">Leaderboard</a>
         </li>
 
+        <li class="nav-item">
+        <a class="nav-link"> | </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="/">Logout</a>
+        </li>
       </ul>
+           {% else %}
+
+           <h2> STOCK TRADING SIMULATOR </h2>
+
+           {% endif %}
     </div>
   </div>
 </nav>
