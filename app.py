@@ -7,7 +7,7 @@ app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///test.db'
 db.init_app(app)
 
 @app.route('/')
-def dashboard():
+def landingPage():
     return "THIS IS HOME PAGE"
 
 
