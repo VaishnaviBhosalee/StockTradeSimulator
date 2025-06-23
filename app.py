@@ -8,7 +8,7 @@ db.init_app(app)
 
 @app.route('/')
 def landingPage():
-    return "THIS IS Landing Page"
+    return render_template('landing_page.html')
 
 
 if __name__ == "__main__":
