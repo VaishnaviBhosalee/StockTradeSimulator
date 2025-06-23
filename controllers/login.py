@@ -1,9 +1,9 @@
-from flask import render_template,redirect
+from flask import render_template,redirect, request
 from create_app import app
 from extensions import db
 from models.user import User
 
-@app.route('/login')
+@app.route('/login', methods=['POST','GET'])
 def login():
     if request.method=='POST':
         user_user_name=request.form['user_name']
