@@ -8,7 +8,7 @@ db.init_app(app)
 
 @app.route('/')
 def dashboard():
-    return "THIS IS HOME PAGE"
+    return "THIS IS HOME PAGEee"
 
 
 if __name__ == "__main__":
