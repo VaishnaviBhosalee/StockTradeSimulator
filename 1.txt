@@ -1,12 +1,10 @@
-{% extends "base.html" %}
-
-
-{% block title %} Research {% endblock %}
-
-
-{% block head %}
-<h2> RESEARCH PAGE </h2>
-
+<!-- templates/research.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Stock Research</title>
+</head>
+<body>
   <h2>Search for a Stock</h2>
   <input id="searchInput" placeholder="Enter symbol (e.g. TSLA)" />
   <button onclick="search()">Search</button>
@@ -46,5 +44,5 @@
       document.getElementById("results").innerHTML = info;
     }
   </script>
-
-{% endblock %}
+</body>
+</html>
