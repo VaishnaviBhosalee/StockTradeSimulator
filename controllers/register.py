@@ -1,4 +1,4 @@
-from flask import render_template,redirect
+from flask import render_template,redirect,request
 from create_app import app
 from extensions import db
 from models.user import User
@@ -10,7 +10,7 @@ def register():
         user_username = request.form['user_name']
         user_password = request.form['pass_word']
         user_fullname = request.form['full_name']
-        user_address = request.form['disp_name']
+        disp_name = request.form['disp_name']
 
         new_user = User(email = user_email, 
                         username = user_username, 
