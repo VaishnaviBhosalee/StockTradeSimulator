@@ -1,1 +1,9 @@
-__all__=["register", "login", "home", "leaderboard", "learn", "research", "trade"]
+__all__=["register", 
+        "login", 
+        "home", 
+        "leaderboard", 
+        "learn", 
+        "research", 
+        "trade", 
+        "api_quote", 
+        "api_search_symbol"]

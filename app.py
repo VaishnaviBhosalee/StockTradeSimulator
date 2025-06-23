@@ -4,6 +4,12 @@ from flask import Flask, request, jsonify, render_template
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 import requests, os
+from controllers import *
+
+# ---- SET DATABASE BINDS -----------------------------------------
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
+db.init_app(app)
+
 
 # ---- load secrets -------------------------------------------------
 load_dotenv()                           # reads .env
@@ -16,35 +22,6 @@ BASE_URL  = "https://www.alphavantage.co/query"
 def landingPage():
     return render_template('landing_page.html')
 
-# 1. symbol auto-complete
-@app.route('/api/search')
-def search_symbol():
-    q = request.args.get("q", "")
-    r = requests.get(BASE_URL, params={
-        "function": "SYMBOL_SEARCH",
-        "keywords": q,
-        "apikey": os.getenv("ALPHA_KEY")
-    }, timeout=10)
-    matches = r.json().get("bestMatches", [])[:10]
-    return jsonify([
-        {"symbol": m["1. symbol"], "name": m["2. name"], "region": m["4. region"]}
-        for m in matches
-    ])
-
-# 2. point-in-time quote
-@app.route('/api/quote')
-def quote():
-    symbol = request.args.get("symbol")
-    r = requests.get(BASE_URL, params={
-        "function": "GLOBAL_QUOTE",
-        "symbol": symbol,
-        "apikey": os.getenv("ALPHA_KEY")
-    }, timeout=10)
-    return jsonify(r.json().get("Global Quote", {}))
-
-@app.route("/research")
-def research_page():
-    return render_template("research.html")
 
 # ---- run the server ----------------------------------------------
 if __name__ == '__main__':
