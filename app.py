@@ -1,7 +1,7 @@
 from flask import Flask,render_template,request,redirect,url_for,session
 from create_app import app
 from extensions import db
-
+from controllers import *
 
 app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///test.db'
 db.init_app(app)
