@@ -17,6 +17,10 @@
     {% endif %} -->
  
     <div class="collapse navbar-collapse " id="navbarSupportedContent">
+      {% if login_success %}
+      <h2> Welcome, {{user_name}} </h2>
+      {% endif %}
+      
       <ul class="navbar-nav me-auto mb-2 mb-lg-0 mx-auto">
 
         <li class="nav-item">
