@@ -1,3 +1,51 @@
+<!-- templates/research.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Stock Research</title>
+</head>
+<body>
+  <h2>Search for a Stock</h2>
+  <input id="searchInput" placeholder="Enter symbol (e.g. TSLA)" />
+  <button onclick="search()">Search</button>
+
+  <h3>Results:</h3>
+  <div id="results"></div>
+
+  <script>
+    async function search() {
+      const query = document.getElementById("searchInput").value;
+      const res = await fetch(`/api/search?q=${query}`);
+      const data = await res.json();
+
+      const results = document.getElementById("results");
+      results.innerHTML = "";
+
+      for (let item of data) {
+        const btn = document.createElement("button");
+        btn.innerText = `${item.symbol} — ${item.name}`;
+        btn.onclick = () => getQuote(item.symbol);
+        results.appendChild(btn);
+        results.appendChild(document.createElement("br"));
+      }
+    }
+
+    async function getQuote(symbol) {
+      const res = await fetch(`/api/quote?symbol=${symbol}`);
+      const quote = await res.json();
+
+      const info = `
+        <h4>${symbol} Quote:</h4>
+        <p>Price: $${quote["05. price"]}</p>
+        <p>Change: ${quote["09. change"]}</p>
+        <p>% Change: ${quote["10. change percent"]}</p>
+        <p>Volume: ${quote["06. volume"]}</p>
+      `;
+      document.getElementById("results").innerHTML = info;
+    }
+  </script>
+</body>
+</html>
 {% extends "base.html" %}
 
 
