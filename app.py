@@ -13,8 +13,8 @@ BASE_URL  = "https://www.alphavantage.co/query"
 
 # ---- ROUTES -------------------------------------------------------
 @app.route('/')
-def landing_page():
-    return "THIS IS Landing Page"
+def landingPage():
+    return render_template('landing_page.html')
 
 # 1. symbol auto-complete
 @app.route('/api/search')
