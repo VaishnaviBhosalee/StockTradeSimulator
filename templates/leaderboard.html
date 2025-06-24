@@ -25,12 +25,14 @@
   </thead>
   <tbody>
   {% for user, total_value in users %}
+  
   <tr>
-    <td></td>
+    <td>{{loop.index}}</td>
     <td>{{ user.display_name }}</td>
     <td>{{ total_value or 100000 }}</td>
     <td>{{ user.user_finance[0].todays_change if user.user_finance else 'N/A' }}</td>
   </tr>
+  
 {% endfor %}
   </tbody>
 </table>

@@ -4,4 +4,5 @@ from extensions import db
 
 @app.route('/trade/<user_name>/<login_success>')
 def trade(user_name,login_success):
-    return render_template('trade.html', user_name=user_name,login_success=login_success)
+    current_time = datetime.now()
+    return render_template('trade.html', user_name=user_name,login_success=login_success,current_time=current_time)
