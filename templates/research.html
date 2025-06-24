@@ -1,74 +1,161 @@
 {% extends "base.html" %}
+
 {% block title %}Research{% endblock %}
 
 {% block body %}
-<div class="container">
-  <h1>Stock Research</h1>
-  <div class="search-bar">
-    <input type="text" id="searchInput" placeholder="Enter stock symbol (e.g. AAPL)" />
-    <button onclick="search()">Search</button>
+  <div class="research-container">
+      <h1>Stock Research</h1>
+
+      <!-- Symbol Search -->
+      <div class="research-search-bar">
+          <input type="text" id="searchInput" placeholder="Enter stock symbol (e.g. NVDA, AAPL)" />
+          <button id="research-button" onclick="search()">Search</button>
+      </div>
+
+      <!-- Quote Card -->
+      <div id="quoteCard" class="research-card mt-3" style="display: none;">
+          <h2 id="symbol"></h2>
+          <p id="price"></p>
+          <p id="change"></p>
+          <p id="prevClose"></p>
+      </div>
+
+      <!-- Chart -->
+      <canvas id="priceChart" style="display: none; max-width: 100%; height: 300px;"></canvas>
+
+      <!-- Most Traded Stocks Widget -->
+      <div class="mt-5">
+          <h3>Most Traded Stocks</h3>
+          <div class="tradingview-widget-container" id="tradingview_hotlists">
+              <div class="tradingview-widget-container__widget"></div>
+              <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-hotlists.js" async></script>
+              <script type="text/javascript">
+              new TradingView.HotlistsWidget({
+                  "colorTheme": "light",
+                  "dateRange": "12M",
+                  "exchange": "US",
+                  "showChart": true,
+                  "locale": "en",
+                  "width": "100%",
+                  "height": "500",
+                  "largeChartUrl": "",
+                  "isTransparent": true,
+                  "showSymbolLogo": true,
+                  "plotLineColorGrowing": "rgba(41, 98, 255, 1)",
+                  "plotLineColorFalling": "rgba(41, 98, 255, 1)",
+                  "gridLineColor": "rgba(240, 243, 250, 1)",
+                  "scaleFontColor": "rgba(120, 123, 134, 1)",
+                  "belowLineFillColorGrowing": "rgba(41, 98, 255, 0.12)",
+                  "belowLineFillColorFalling": "rgba(41, 98, 255, 0.12)",
+                  "symbolActiveColor": "rgba(41, 98, 255, 0.12)",
+                  "container_id": "tradingview_hotlists"
+              });
+              </script>
+          </div>
+      </div>
+
+      <!-- Stock Screener Widget -->
+      <div class="mt-5">
+          <h3>Stock Screener</h3>
+          <div class="tradingview-widget-container" id="tradingview_hotlists">
+              <div class="tradingview-widget-container__widget"></div>
+              <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-screener.js" async></script>
+              <script type="text/javascript">
+              new TradingView.ScreenerWidget({
+                  "width": "100%",
+                  "height": 523,
+                  "defaultColumn": "overview",
+                  "defaultScreen": "most_capitalized",
+                  "market": "america",
+                  "showToolbar": true,
+                  "isTransparent": true,
+                  "colorTheme": "light",
+                  "largeChartUrl": "www.investopedia.com/simulator/research/more-info",
+                  "enableScrolling": true,
+                  "locale": "en",
+                  "container_id": "tradingview_screener"
+              });
+              </script>
+          </div>
+      </div>
   </div>
 
-  <div id="quoteCard" class="card" style="display: none;">
-    <h2 id="symbol"></h2>
-    <p id="price"></p>
-    <p id="change"></p>
-    <p id="prevClose"></p>
-  </div>
+  <script>
+      async function search() {
+          const symbol = document.getElementById("searchInput").value.trim().toUpperCase();
+          if (!symbol) return;
 
-  <canvas id="priceChart" style="display: none; max-width: 100%; height: 300px;"></canvas>
-</div>
+          try {
+              // Fetch quote data
+              const quoteRes = await fetch(`/api/quote?symbol=${symbol}`);
+              const quote = await quoteRes.json();
 
-<script>
-  async function search() {
-    const symbol = document.getElementById("searchInput").value.trim().toUpperCase();
-    if (!symbol) return;
+              if (!quote.c) {
+                  alert("No stock data found for this symbol.");
+                  return;
+              }
 
-    const quoteRes = await fetch(`/api/quote?symbol=${symbol}`);
-    const quote = await quoteRes.json();
+              // Display quote information
+              document.getElementById("symbol").innerText = symbol;
+              document.getElementById("price").innerText = `Price: ₹${quote.c}`;
+              document.getElementById("change").innerText = `Change: ${quote.d} (${quote.dp}%)`;
+              document.getElementById("prevClose").innerText = `Previous Close: ₹${quote.pc}`;
+              document.getElementById("quoteCard").style.display = "block";
 
-    if (!quote.c) {
-      alert("No data found.");
-      return;
-    }
+              // Try to fetch chart data separately
+              try {
+                  const chartRes = await fetch(`/api/chart?symbol=${symbol}`);
+                  const chartData = await chartRes.json();
 
-    document.getElementById("symbol").innerText = symbol;
-    document.getElementById("price").innerText = `Price: $${quote.c}`;
-    document.getElementById("change").innerText = `Change: ${quote.d} (${quote.dp}%)`;
-    document.getElementById("prevClose").innerText = `Previous Close: $${quote.pc}`;
-    document.getElementById("quoteCard").style.display = "block";
+                  if (chartData.t && chartData.c && chartData.t.length > 0) {
+                      const labels = chartData.t.map(ts => new Date(ts * 1000).toLocaleDateString());
+                      const prices = chartData.c;
 
-    const chartRes = await fetch(`/api/chart?symbol=${symbol}`);
-    const chartData = await chartRes.json();
+                      const ctx = document.getElementById("priceChart").getContext("2d");
+                      document.getElementById("priceChart").style.display = "block";
+                      if (window.myChart) window.myChart.destroy();
 
-    const labels = chartData.t.map(ts => new Date(ts * 1000).toLocaleDateString());
-    const prices = chartData.c;
+                      window.myChart = new Chart(ctx, {
+                          type: 'line',
+                          data: {
+                              labels: labels,
+                              datasets: [{
+                                  label: `${symbol} Closing Prices`,
+                                  data: prices,
+                                  borderColor: 'blue',
+                                  backgroundColor: 'rgba(0, 0, 255, 0.1)',
+                                  fill: true,
+                                  tension: 0.3
+                              }]
+                          },
+                          options: {
+                              responsive: true,
+                              scales: {
+                                  x: { display: true },
+                                  y: { beginAtZero: false }
+                              }
+                          }
+                      });
+                  } else {
+                      console.log('Chart data not available for this symbol');
+                      document.getElementById("priceChart").style.display = "none";
+                  }
+              } catch (chartError) {
+                  console.log('Chart data not available:', chartError.message);
+                  document.getElementById("priceChart").style.display = "none";
+              }
 
-    const ctx = document.getElementById("priceChart").getContext("2d");
-    document.getElementById("priceChart").style.display = "block";
-    if (window.myChart) window.myChart.destroy();
-
-    window.myChart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: labels,
-        datasets: [{
-          label: `${symbol} Closing Prices`,
-          data: prices,
-          borderColor: 'blue',
-          backgroundColor: 'rgba(0, 0, 255, 0.1)',
-          fill: true,
-          tension: 0.3
-        }]
-      },
-      options: {
-        responsive: true,
-        scales: {
-          x: { display: true },
-          y: { beginAtZero: false }
-        }
+          } catch (error) {
+              console.error('Error fetching quote data:', error);
+              alert('Error fetching stock data. Please check the symbol and try again.');
+          }
       }
-    });
-  }
-</script>
+
+      // Allow Enter key to trigger search
+      document.getElementById("searchInput").addEventListener("keypress", function(event) {
+          if (event.key === "Enter") {
+              search();
+          }
+      });
+  </script>
 {% endblock %}
