@@ -5,13 +5,17 @@ from dotenv import load_dotenv
 import os
 from controllers import *
 import requests
+from datetime import datetime, timedelta
 # ---- SET DATABASE BINDS -----------------------------------------
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
 db.init_app(app)
+
+load_dotenv()
+
 FINNHUB_KEY = os.getenv("FINNHUB_KEY")
 
-# ---- load secrets -------------------------------------------------
-load_dotenv()
+
+
 
 # ---- UI ROUTES ----------------------------------------------------
 @app.route('/')
@@ -53,16 +57,38 @@ def quote():
         return jsonify({"error": "Request failed", "details": str(e)}), 500
 
 
-@app.route("/api/chart")
+import os
+import requests
+from flask import request, jsonify
+
+@app.route('/api/chart')
 def chart():
     symbol = request.args.get("symbol", "").upper()
-    res = requests.get("https://finnhub.io/api/v1/stock/candle", params={
+    api_key = os.getenv("ALPHA_KEY")  # or hardcode for testing
+
+    url = f"https://www.alphavantage.co/query"
+    params = {
+        "function": "TIME_SERIES_DAILY",
         "symbol": symbol,
-        "resolution": "D",
-        "count": 7,
-        "token": FINNHUB_KEY
-    })
-    return jsonify(res.json())
+        "apikey": api_key
+    }
+
+    res = requests.get(url, params=params)
+    data = res.json()
+
+    try:
+        ts = data["Time Series (Daily)"]
+        dates = list(ts.keys())[::-1][:30]  # last 30 days
+        prices = [float(ts[d]["4. close"]) for d in dates]
+
+        return jsonify({
+            "t": dates,
+            "c": prices
+        })
+    except:
+        return jsonify({"error": "Chart data not available", "api_response": data})
+
+
 
 # ---- run the server ----------------------------------------------
 if __name__ == '__main__':
