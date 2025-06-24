@@ -5,6 +5,37 @@
 
 
 {% block body %}
-<h2> LEADERBOARD PAGE </h2>
+<h2 style="text-align: center; margin: 50px; border: 2px solid black; padding: 10px;">
+  Leaderboard
+</h2>
 
+
+
+<div class="card text-center m-5 border-black">
+  <div class="card-body">  
+    <table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Rank</th>
+      <th scope="col">Display Name</th>
+      <th scope="col">Total Value</th>
+      <th scope="col">Today's Change</th>
+
+    </tr>
+  </thead>
+  <tbody>
+  {%for user in users%}
+    <tr>
+      <th scope="row"></th>
+      <td>{{user.display_name}}</td>
+      <td></td>
+      <td></td>
+    </tr>
+    {%endfor%}
+  </tbody>
+</table>
+    
+  </div>
+  
+</div>
 {% endblock %}
