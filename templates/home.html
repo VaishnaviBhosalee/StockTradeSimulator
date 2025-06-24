@@ -5,38 +5,46 @@
 
 
 {% block body %}
-<h2> HOME PAGE </h2>
+<h2 style="text-align: center;margin:50px;"> HOME PAGE </h2>
 
 <!-- ──────────────────────────────────  Holdings  ────────────────────────────────── -->
-<table class="table">
+<div class="card start-50 translate-middle-x m-5" style="width:80%; align-items:center;">
+    <h5>Holding</h5>
+</div>
+<div class="card text-center m-5">
+  <div class="card-body" >
+    <table class="table">
   <thead>
     <tr>
-      <th scope="col">#</th>
-      <th scope="col">First</th>
-      <th scope="col">Last</th>
-      <th scope="col">Handle</th>
+      <th scope="col">Symbol</th>
+      <th scope="col">Description</th>
+      <th scope="col">Current price</th>
+      <th scope="col">Today's Change</th>
+      <th scope="col">Purchase Price</th>
+      <th scope="col">Qty</th>
+      <th scope="col">Total value</th>
+      <th scope="col">Total Gain/Loss</th>
+      <th scope="col">Trade actions</th>
+      
     </tr>
   </thead>
   <tbody>
+  
     <tr>
-      <th scope="row">1</th>
-      <td>Mark</td>
-      <td>Otto</td>
-      <td>@mdo</td>
+      <th scope="row"></th>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      
     </tr>
-    <tr>
-      <th scope="row">2</th>
-      <td>Jacob</td>
-      <td>Thornton</td>
-      <td>@fat</td>
-    </tr>
-    <tr>
-      <th scope="row">3</th>
-      <td>John</td>
-      <td>Doe</td>
-      <td>@social</td>
-    </tr>
+
+    
   </tbody>
 </table>
-
+    
+  </div>
+  
+</div>
 {% endblock %}

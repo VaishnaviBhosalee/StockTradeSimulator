@@ -12,7 +12,7 @@
     </head>
 
     <body>
-      <nav class="navbar navbar-expand-lg bg-body-tertiary">
+      <nav class="navbar navbar-expand-lg bg-body-tertiary position-relative">
   <div class="container-fluid">
     <!-- {% if login_success %}
     <a class="navbar-brand">Welcome, {{ user_name }}</a>
@@ -22,7 +22,7 @@
       {% if login_success %}
       <h5> Welcome, {{user_name}} </h5>
       
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0 mx-auto">
+      <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
 
         <li class="nav-item">
           <a class="nav-link active" aria-current="page" href="{{ url_for ('home', user_name=user_name, login_success=login_success) }}">Home</a>
