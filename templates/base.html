@@ -33,7 +33,7 @@
         </li>
 
         <li class="nav-item">
-          <a class="nav-link" href="/trade">Trade</a>
+          <a class="nav-link" href="{{ url_for ('trade', user_name=user_name, login_success=login_success) }}">Trade</a>
         </li>
 
         <li class="nav-item">
@@ -41,7 +41,7 @@
         </li>
 
         <li class="nav-item">
-          <a class="nav-link" href="/research">Research</a>
+          <a class="nav-link" href="{{ url_for ('research', user_name=user_name, login_success=login_success) }}">Research</a>
         </li>
 
         <li class="nav-item">
@@ -49,7 +49,7 @@
         </li>
 
         <li class="nav-item">
-          <a class="nav-link" href="/learn">Learn</a>
+          <a class="nav-link" href="{{ url_for ('learn', user_name=user_name, login_success=login_success) }}">Learn</a>
         </li>
 
         <li class="nav-item">
@@ -57,7 +57,7 @@
         </li>
 
         <li class="nav-item">
-          <a class="nav-link" href="/leaderboard">Leaderboard</a>
+          <a class="nav-link" href="{{ url_for ('leaderboard', user_name=user_name, login_success=login_success) }}">Leaderboard</a>
         </li>
 
         <li class="nav-item">

@@ -11,7 +11,7 @@ class UserStock(db.Model):
     stock_symbol = db.Column(db.String(50), unique=True)
     total_value = db.Column(db.Float, nullable=False)
     status = db.Column(db.Boolean, default=True)
+    # Active = True, Inactive = False
 
-    
     def __repr__(self):
         return f'<Stock {self.id}>'

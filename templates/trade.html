@@ -1,32 +1,159 @@
 {% extends "base.html" %}
 
-
 {% block title %} Trade {% endblock %}
 
-
 {% block body %}
-<h2 style="text-align: center; margin: 20px;padding: 20px;"> TRADE PAGE </h2>
-<div class="border border-black m-5 mx-auto p-5" style="text-align: center;max-width: 1000px">
-  <form action="/trade" method="POST">
+<h2 style="text-align: center; margin: 20px; padding: 20px;">TRADE PAGE</h2>
+
+<div class="border border-black m-5 mx-auto p-5" style="text-align: center; max-width: 1000px">
+  <form action="/trade" method="POST" id="tradeForm">
     
+    <!-- Stock Symbol -->
+    <div class="input-group m-4 mx-auto" style="max-width:800px;">
+      <input type="text" class="form-control" id="stockSymbol" name="stock_symbol" placeholder="Stock Symbol" aria-label="Stock Symbol">
+    </div>
 
-<div class="input-group m-4 mx-auto" style="max-width:800px;">
-  <input type="text" class="form-control" name="user_name" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1">
+    <!-- Stock Name (Autopopulated) -->
+    <div class="input-group m-4 mx-auto" style="max-width:800px;">
+      <input type="text" class="form-control" id="stockName" placeholder="Stock Name (autofilled)" readonly>
+    </div>
+
+    <!-- Quantity + Max Label -->
+    <div class="input-group m-4 mx-auto" style="max-width:800px;">
+      <input type="number" class="form-control" id="qty" name="qty" placeholder="Quantity" min="1">
+      <span class="input-group-text" id="qtyMaxLabel">/ --</span>
+    </div>
+
+    <!-- Total Price -->
+    <div class="input-group m-4 mx-auto" style="max-width:800px;">
+      <input type="text" class="form-control" id="totalPrice" placeholder="Total Price (autofilled)" readonly>
+    </div>
+
+    <!-- Action -->
+    <div class="input-group m-4 mx-auto" style="max-width:800px;">
+      <select class="form-select" name="action">
+        <option value="" disabled selected>Select Action</option>
+        <option value="buy">Buy</option>
+        <option value="sell">Sell</option>
+      </select>
+    </div>
+
+    <!-- Duration -->
+    <div class="input-group m-4 mx-auto" style="max-width:800px;">
+      <select class="form-select" name="duration">
+        <option value="" disabled selected>Select Duration</option>
+        <option value="intraday">Intraday</option>
+        <option value="longterm">Long Term</option>
+      </select>
+    </div>
+
+    <!-- Order Type -->
+    <div class="input-group m-4 mx-auto" style="max-width:800px;">
+      <select class="form-select" name="order_type">
+        <option value="" disabled selected>Select Order Type</option>
+        <option value="market">Market</option>
+        <option value="limit">Limit</option>
+      </select>
+    </div>
+
+    <!-- Submit -->
+    <div class="m-4">
+      <button type="submit" class="btn btn-primary">Submit Order</button>
+    </div>
+
+    <!-- Live Price Widget -->
+    <div id="livePriceWidget" class="border rounded p-3 mt-4" style="display:none; max-width: 400px; margin:auto;">
+      <h5 id="liveSymbol">Symbol: --</h5>
+      <p><strong>Live Price:</strong> $<span id="livePrice">--</span></p>
+    </div>
+
+  </form>
 </div>
 
-<div class="input-group m-4 mx-auto" style="max-width:800px;">
-  <input type="email" class="form-control" name="email" placeholder="Email" aria-label="Email" aria-describedby="basic-addon1">
-</div>
+<script>
+  const bankBalance = 100000;
+  const finnhubApiKey = "d1cputpr01qic6lf8dp0d1cputpr01qic6lf8dpg";  // Replace with your own
 
-<div class="input-group m-4 mx-auto" style="max-width:800px;">
-  <input type="password" class="form-control" name="pass_word" placeholder="Password" aria-label="Password" aria-describedby="basic-addon1">
-</div>
+  let ws = null;
 
-<div class="input-group m-4 mx-auto" style="max-width:800px;">
-  <input type="text" class="form-control" name="full_name" placeholder="Fullname" aria-label="Fullname" aria-describedby="basic-addon1">
-</div>
+  async function fetchStockDetails(symbol) {
+    const url = `https://finnhub.io/api/v1/stock/profile2?symbol=${symbol}&token=${finnhubApiKey}`;
+    try {
+      const res = await fetch(url);
+      const data = await res.json();
+      document.getElementById("stockName").value = data.name || "Not Found";
+    } catch (err) {
+      console.error("Error fetching stock name", err);
+    }
+  }
 
-<div class="input-group m-4 mx-auto" style="max-width:800px;">
-  <input type="text" class="form-control" name="disp_name" placeholder="Leaderboard Display Name" aria-label="Display Name" aria-describedby="basic-addon1">
-</div>
+  async function fetchStockPrice(symbol) {
+    const url = `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${finnhubApiKey}`;
+    try {
+      const res = await fetch(url);
+      const data = await res.json();
+      return parseFloat(data.c) || 0;
+    } catch (err) {
+      console.error("Error fetching stock price", err);
+      return 0;
+    }
+  }
+
+  function openWebSocket(symbol) {
+    if (ws) {
+      ws.close();
+    }
+
+    ws = new WebSocket(`wss://ws.finnhub.io?token=${finnhubApiKey}`);
+    ws.onopen = () => {
+      ws.send(JSON.stringify({ type: 'subscribe', symbol }));
+      document.getElementById("liveSymbol").textContent = `Symbol: ${symbol}`;
+      document.getElementById("livePriceWidget").style.display = 'block';
+    };
+
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === "trade" && data.data.length > 0) {
+        const price = data.data[0].p;
+        document.getElementById("livePrice").textContent = price.toFixed(2);
+      }
+    };
+
+    ws.onerror = (err) => {
+      console.error("WebSocket error:", err);
+    };
+
+    ws.onclose = () => {
+      console.log("WebSocket closed");
+    };
+  }
+
+  document.getElementById("stockSymbol").addEventListener("change", async (e) => {
+    const symbol = e.target.value.trim().toUpperCase();
+    if (!symbol) return;
+
+    await fetchStockDetails(symbol);
+    const price = await fetchStockPrice(symbol);
+    const maxQty = Math.floor(bankBalance / price);
+    document.getElementById("qtyMaxLabel").innerText = `/ ${maxQty}`;
+
+    openWebSocket(symbol);
+
+    const qtyInput = document.getElementById("qty");
+    const totalPriceField = document.getElementById("totalPrice");
+
+    qtyInput.value = "";
+    totalPriceField.value = "";
+
+    qtyInput.oninput = () => {
+      let qty = parseInt(qtyInput.value || 0);
+      if (qty > maxQty) {
+        qty = maxQty;
+        qtyInput.value = qty;
+      }
+      const total = (qty * price).toFixed(2);
+      totalPriceField.value = total;
+    };
+  });
+</script>
 {% endblock %}

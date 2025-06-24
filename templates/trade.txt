@@ -1,0 +1,32 @@
+<!-- {% extends "base.html" %}
+
+
+{% block title %} Trade {% endblock %}
+
+
+{% block body %}
+<h2 style="text-align: center; margin: 20px;padding: 20px;"> TRADE PAGE </h2>
+<div class="border border-black m-5 mx-auto p-5" style="text-align: center;max-width: 1000px">
+  <form action="/trade" method="POST">
+    
+
+<div class="input-group m-4 mx-auto" style="max-width:800px;">
+  <input type="text" class="form-control" name="stock_symbol" placeholder="Stock Symbol" aria-label="StockSymbol" aria-describedby="basic-addon1">
+</div>
+
+<div class="input-group m-4 mx-auto" style="max-width:800px;">
+  <input type="email" class="form-control" name="qty" placeholder="Quantity" aria-label="Qty" aria-describedby="basic-addon1">
+</div>
+
+<div class="input-group m-4 mx-auto" style="max-width:800px;">
+  <input type="password" class="form-control" name="pass_word" placeholder="Password" aria-label="Password" aria-describedby="basic-addon1">
+</div>
+
+<div class="input-group m-4 mx-auto" style="max-width:800px;">
+  <input type="text" class="form-control" name="full_name" placeholder="Fullname" aria-label="Fullname" aria-describedby="basic-addon1">
+</div>
+
+<div class="input-group m-4 mx-auto" style="max-width:800px;">
+  <input type="text" class="form-control" name="disp_name" placeholder="Leaderboard Display Name" aria-label="Display Name" aria-describedby="basic-addon1">
+</div>
+{% endblock %} -->
