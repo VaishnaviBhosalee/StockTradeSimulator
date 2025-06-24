@@ -70,17 +70,19 @@
   </form>
 </div>
 
-<!-- <script>
+<script>
   const bankBalance = 100000;
   const finnhubApiKey = "d1cputpr01qic6lf8dp0d1cputpr01qic6lf8dpg";
   let ws = null;
   let lastPrice = null;
 
+  // Fetch full company name
   async function fetchStockDetails(symbol) {
     const url = `https://finnhub.io/api/v1/stock/profile2?symbol=${symbol}&token=${finnhubApiKey}`;
     try {
       const res = await fetch(url);
       const data = await res.json();
+
       if (data && data.name) {
         document.getElementById("stockName").value = data.name;
         return true;
@@ -90,27 +92,32 @@
       }
     } catch (err) {
       console.error("Error fetching stock details", err);
+      document.getElementById("stockName").value = "Error";
       return false;
     }
   }
 
+  // Fetch current price for total calculation
   async function fetchStockPrice(symbol) {
     const url = `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${finnhubApiKey}`;
     try {
       const res = await fetch(url);
       const data = await res.json();
-      return parseFloat(data.c) || 0;
+      return parseFloat(data.c) || 0;  // c = current price
     } catch (err) {
       console.error("Error fetching stock price", err);
       return 0;
     }
   }
 
+  // Setup live price WebSocket
   function openWebSocket(symbol) {
     if (ws) ws.close();
 
     ws = new WebSocket(`wss://ws.finnhub.io?token=${finnhubApiKey}`);
+
     ws.onopen = () => {
+      console.log("WebSocket connected");
       ws.send(JSON.stringify({ type: 'subscribe', symbol }));
       document.getElementById("liveSymbol").textContent = `Symbol: ${symbol}`;
       document.getElementById("livePriceWidget").style.display = 'block';
@@ -121,10 +128,8 @@
       if (data.type === "trade" && data.data.length > 0) {
         const price = data.data[0].p;
         const priceElem = document.getElementById("livePrice");
-        const delta = lastPrice && price !== lastPrice;
 
-        // Apply color change
-        if (delta) {
+        if (lastPrice !== null && price !== lastPrice) {
           priceElem.style.color = price > lastPrice ? "green" : "red";
         }
 
@@ -132,20 +137,36 @@
         lastPrice = price;
       }
     };
+
+    ws.onerror = (err) => {
+      console.error("WebSocket error:", err);
+    };
+
+    ws.onclose = () => {
+      console.log("WebSocket closed");
+    };
   }
 
+  // Called when user enters a valid stock symbol
   async function handleSymbolChange(symbol) {
     const valid = await fetchStockDetails(symbol);
     if (!valid) return;
 
     const price = await fetchStockPrice(symbol);
+    if (price === 0) {
+      alert("Failed to fetch live price.");
+      return;
+    }
+
+    lastPrice = price;
+
     const maxQty = Math.floor(bankBalance / price);
     document.getElementById("qtyMaxLabel").innerText = `/ ${maxQty}`;
-    lastPrice = price;
 
     const qtyInput = document.getElementById("qty");
     const totalPriceField = document.getElementById("totalPrice");
 
+    // Reset fields
     qtyInput.value = "";
     totalPriceField.value = "";
 
@@ -162,17 +183,18 @@
     openWebSocket(symbol);
   }
 
-  // Bind event once
+  // Handle symbol input
   document.getElementById("stockSymbol").addEventListener("change", async (e) => {
     const symbol = e.target.value.trim().toUpperCase();
     if (!symbol) return;
     await handleSymbolChange(symbol);
   });
-</script> -->
+</script>
 
-<script>
+
+<!-- <script>
   const bankBalance = 100000;
-  const twelveDataKey = "YOUR_TWELVE_DATA_API_KEY";  // Replace with your key
+  const twelveDataKey = "83b75dac426e44c89667b743c183c638";  // Replace with your key
   let lastPrice = null;
   let ws = null;
 
@@ -181,8 +203,8 @@
       const res = await fetch(`https://api.twelvedata.com/symbol_search?symbol=${symbol}&apikey=${twelveDataKey}`);
       const data = await res.json();
 
-      if (data && data.data && data.data.length > 0) {
-        document.getElementById("stockName").value = data.data[0].name;
+      if (data && Array.isArray(data.data) && data.data.length > 0) {
+        document.getElementById("stockName").value = data.data[0].instrument_name || "Name not found";
         return true;
       } else {
         document.getElementById("stockName").value = "Invalid Symbol";
@@ -272,7 +294,7 @@
     if (!symbol) return;
     await handleSymbolChange(symbol);
   });
-</script>
+</script> -->
 
 
 {% endblock %}
