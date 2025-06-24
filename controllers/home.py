@@ -7,6 +7,6 @@ from models.user import User
 @app.route('/home/<user_name>/<login_success>')
 def home(user_name,login_success):
     user = User.query.filter_by(username=user_name).first_or_404()
-    stocks = us.stocks  # No need for join
+    stocks = user.user_stocks
 
     return render_template('home.html',user_name=user_name,login_success=login_success, stocks=stocks)
