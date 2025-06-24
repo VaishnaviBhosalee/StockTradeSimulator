@@ -27,7 +27,7 @@
           <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
 
             <li class="nav-item">
-              <a class="nav-link {% if request.endpoint == 'home' %}active{% endif %}"
+              <a class="nav-link {% if request.endpoint == 'home' %} active {% endif %}"
                  href="{{ url_for('home', user_name=user_name, login_success=login_success) }}">
                 Home
               </a>
@@ -36,7 +36,7 @@
             <li class="nav-item"><a class="nav-link"> | </a></li>
 
             <li class="nav-item">
-              <a class="nav-link {% if request.endpoint == 'trade' %}active{% endif %}"
+              <a class="nav-link {% if request.endpoint == 'trade' %} active {% endif %}"
                  href="{{ url_for('trade', user_name=user_name, login_success=login_success) }}">
                 Trade
               </a>
@@ -45,7 +45,7 @@
             <li class="nav-item"><a class="nav-link"> | </a></li>
 
             <li class="nav-item">
-              <a class="nav-link {% if request.endpoint == 'research' %}active{% endif %}"
+              <a class="nav-link {% if request.endpoint == 'research' %} active {% endif %}"
                  href="{{ url_for('research', user_name=user_name, login_success=login_success) }}">
                 Research
               </a>
@@ -54,7 +54,7 @@
             <li class="nav-item"><a class="nav-link"> | </a></li>
 
             <li class="nav-item">
-              <a class="nav-link {% if request.endpoint == 'learn' %}active{% endif %}"
+              <a class="nav-link {% if request.endpoint == 'learn' %} active {% endif %}"
                  href="{{ url_for('learn', user_name=user_name, login_success=login_success) }}">
                 Learn
               </a>
@@ -63,7 +63,7 @@
             <li class="nav-item"><a class="nav-link"> | </a></li>
 
             <li class="nav-item">
-              <a class="nav-link {% if request.endpoint == 'leaderboard' %}active{% endif %}"
+              <a class="nav-link {% if request.endpoint == 'leaderboard' %} active {% endif %}"
                  href="{{ url_for('leaderboard', user_name=user_name, login_success=login_success) }}">
                 Leaderboard
               </a>
