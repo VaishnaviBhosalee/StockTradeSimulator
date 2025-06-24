@@ -1,58 +1,97 @@
 {% extends "base.html" %}
 
-
 {% block title %} Home {% endblock %}
 
-
 {% block body %}
-<h2 style="text-align: center;margin:50px;"> HOME PAGE </h2>
+<h2 style="text-align: center;margin:50px;">HOME PAGE</h2>
 
-<!-- ──────────────────────────────────  Holdings  ────────────────────────────────── -->
-<div class="card mx-auto my-5 text-center" style="width: 80%;">
-    <h5 class="card-title">Holding</h5>
-</div>
-
-<div class="card text-center m-5">
-  <div class="card-body">  
-    <table class="table">
-  <thead>
-    <tr>
-      <th scope="col">ID</th>
-      <th scope="col">Symbol</th>
-      <th scope="col">Description</th>
-      <th scope="col">Current price</th>
-      <th scope="col">Today's Change</th>
-      <th scope="col">Purchase Price</th>
-      <th scope="col">Qty</th>
-      <th scope="col">Total value</th>
-      <th scope="col">Total Gain/Loss</th>
-      <th scope="col">Trade actions</th>
-      
-    </tr>
-  </thead>
-  <tbody>
-  {% for stock in stocks %}
-    <tr>
-      <th scope="row"> {{ loop.index }} </th>
-      <td> {{stock.stock_symbol}} </td>
-      <td> {{stock.stock_name}} </td>
-      <td> {{stock.stock_symbol}} </td>
-      <td> {{stock.stock_symbol}} </td>
-      <td> {{stock.buy_price_of_user}} </td>
-      <td> {{stock.qty}} </td>
-      <td> {{stock.total_value}} </td>
-      <td>
-      <a class="btn btn-warning"> Buy More </a>
-      <a class="btn btn-warning"> Sell </a>  
-      </td>
-      
-    </tr>
-{% endfor %}
-    
-  </tbody>
-</table>
-    
+<!-- ───────────────────── Account Overview ───────────────────── -->
+<div class="dashboard-container">
+  <div class="stats-card">
+    <div class="stat">
+      <h4>ACCOUNT VALUE</h4>
+      <p class="value">${{ account_value }}</p>
+    </div>
+    <div class="stat">
+      <h4>TODAY'S CHANGE</h4>
+      <p class="change">{{ todays_change }}</p>
+    </div>
   </div>
-  
+
+  <div class="chart-card">
+    <h4>PERFORMANCE (1W)</h4>
+    <canvas id="performanceChart"></canvas>
+  </div>
 </div>
+
+<!-- ───────────────────── Holdings Table ───────────────────── -->
+<div class="card mx-auto my-5 text-center" style="width: 80%;">
+    <h5 class="card-title p-3">Holding</h5>
+    <div class="card-body">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Symbol</th>
+                    <th>Description</th>
+                    <th>Purchase Price</th>
+                    <th>Qty</th>
+                    <th>Total Value</th>
+                    <th>Trade Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for stock in stocks %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ stock.stock_symbol }}</td>
+                    <td>{{ stock.stock_name }}</td>
+                    <td>${{ "{:,.2f}".format(stock.buy_price_of_user) }}</td>
+                    <td>{{ stock.qty }}</td>
+                    <td>${{ "{:,.2f}".format(stock.total_value) }}</td>
+                    <td>
+                        <a class="btn btn-success btn-sm">Buy More</a>
+                        <a class="btn btn-danger btn-sm">Sell</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="7">No holdings found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ───────────────────── Chart.js Script ───────────────────── -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const ctx = document.getElementById('performanceChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ['Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue'],
+      datasets: [{
+        label: 'Value',
+        data: {{ performance_values | safe }},
+        borderColor: '#00c8ff',
+        backgroundColor: 'rgba(0, 200, 255, 0.2)',
+        pointBackgroundColor: '#00c8ff',
+        tension: 0.3
+      }]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: false
+        }
+      },
+      plugins: {
+        legend: {
+          display: false
+        }
+      }
+    }
+  });
+</script>
+
 {% endblock %}
