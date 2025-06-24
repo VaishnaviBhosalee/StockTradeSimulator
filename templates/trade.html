@@ -72,18 +72,25 @@
 
 <script>
   const bankBalance = 100000;
-  const finnhubApiKey = "d1cputpr01qic6lf8dp0d1cputpr01qic6lf8dpg";  // Replace with your own
-
+  const finnhubApiKey = "d1cputpr01qic6lf8dp0d1cputpr01qic6lf8dpg";
   let ws = null;
+  let lastPrice = null;
 
   async function fetchStockDetails(symbol) {
     const url = `https://finnhub.io/api/v1/stock/profile2?symbol=${symbol}&token=${finnhubApiKey}`;
     try {
       const res = await fetch(url);
       const data = await res.json();
-      document.getElementById("stockName").value = data.name || "Not Found";
+      if (data && data.name) {
+        document.getElementById("stockName").value = data.name;
+        return true;
+      } else {
+        document.getElementById("stockName").value = "Invalid Symbol";
+        return false;
+      }
     } catch (err) {
-      console.error("Error fetching stock name", err);
+      console.error("Error fetching stock details", err);
+      return false;
     }
   }
 
@@ -100,9 +107,7 @@
   }
 
   function openWebSocket(symbol) {
-    if (ws) {
-      ws.close();
-    }
+    if (ws) ws.close();
 
     ws = new WebSocket(`wss://ws.finnhub.io?token=${finnhubApiKey}`);
     ws.onopen = () => {
@@ -115,29 +120,28 @@
       const data = JSON.parse(event.data);
       if (data.type === "trade" && data.data.length > 0) {
         const price = data.data[0].p;
-        document.getElementById("livePrice").textContent = price.toFixed(2);
+        const priceElem = document.getElementById("livePrice");
+        const delta = lastPrice && price !== lastPrice;
+
+        // Apply color change
+        if (delta) {
+          priceElem.style.color = price > lastPrice ? "green" : "red";
+        }
+
+        priceElem.textContent = price.toFixed(2);
+        lastPrice = price;
       }
-    };
-
-    ws.onerror = (err) => {
-      console.error("WebSocket error:", err);
-    };
-
-    ws.onclose = () => {
-      console.log("WebSocket closed");
     };
   }
 
-  document.getElementById("stockSymbol").addEventListener("change", async (e) => {
-    const symbol = e.target.value.trim().toUpperCase();
-    if (!symbol) return;
+  async function handleSymbolChange(symbol) {
+    const valid = await fetchStockDetails(symbol);
+    if (!valid) return;
 
-    await fetchStockDetails(symbol);
     const price = await fetchStockPrice(symbol);
     const maxQty = Math.floor(bankBalance / price);
     document.getElementById("qtyMaxLabel").innerText = `/ ${maxQty}`;
-
-    openWebSocket(symbol);
+    lastPrice = price;
 
     const qtyInput = document.getElementById("qty");
     const totalPriceField = document.getElementById("totalPrice");
@@ -154,6 +158,16 @@
       const total = (qty * price).toFixed(2);
       totalPriceField.value = total;
     };
+
+    openWebSocket(symbol);
+  }
+
+  // Bind event once
+  document.getElementById("stockSymbol").addEventListener("change", async (e) => {
+    const symbol = e.target.value.trim().toUpperCase();
+    if (!symbol) return;
+    await handleSymbolChange(symbol);
   });
 </script>
+
 {% endblock %}
