@@ -31,20 +31,23 @@
     </tr>
   </thead>
   <tbody>
-  
+  {% for stock in stocks %}
     <tr>
-      <th scope="row"></th>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
+      <th scope="row"> {{ loop.index }} </th>
+      <td> {{stock.stock_symbol}} </td>
+      <td> {{stock.stock_name}} </td>
+      <td> {{stock.stock_symbol}} </td>
+      <td> {{stock.stock_symbol}} </td>
+      <td> {{stock.buy_price_of_user}} </td>
+      <td> {{stock.qty}} </td>
+      <td> {{stock.total_value}} </td>
+      <td>
+      <a class="btn btn-warning"> Buy More </a>
+      <a class="btn btn-warning"> Sell </a>  
+      </td>
       
     </tr>
-
+{% endfor %}
     
   </tbody>
 </table>
