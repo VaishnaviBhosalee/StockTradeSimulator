@@ -1,10 +1,13 @@
+# Python virtual environments and environment config
 env/
-.env
 venv/
+.env
+
+# Bytecode and cache
 __pycache__/
-*.pyc
 *.py[cod]
+
+# Databases and Flask instance folder
 *.sqlite3
 *.db
 instance/
-*.py[cod]
