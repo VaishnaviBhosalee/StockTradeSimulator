@@ -1,6 +1,6 @@
 from extensions import db
 
-
+#leaderboard
 class UserFinance(db.Model):
     __tablename__='finances'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
