@@ -2,9 +2,10 @@ from flask import render_template,redirect,request
 from create_app import app
 from extensions import db
 from models.user import User
-
+from datetime import datetime
 @app.route('/register', methods=["POST","GET"])
 def register():
+    current_time = datetime.now()
     if request.method == 'POST':
         user_email = request.form['email']
         user_username = request.form['user_name']
@@ -25,4 +26,4 @@ def register():
         except:
             return "There was a problem registering you"
         
-    return render_template("register.html")
+    return render_template("register.html",current_time=current_time)

@@ -1,7 +1,7 @@
 from flask import render_template,redirect
 from create_app import app
 from extensions import db
-
+from datetime import datetime
 @app.route('/trade/<user_name>/<login_success>')
 def trade(user_name,login_success):
     current_time = datetime.now()
