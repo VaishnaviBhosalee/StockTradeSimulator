@@ -5,7 +5,7 @@ from models.user import User
 from models.user_finance import UserFinance
 from models.user_stocks import UserStocks
 from sqlalchemy.sql import func 
-
+from datetime import datetime
 @app.route('/leaderboard/<user_name>/<login_success>')
 def leaderboard(user_name,login_success):
     users = (
@@ -15,4 +15,5 @@ def leaderboard(user_name,login_success):
         .order_by(func.sum(UserStocks.total_value).desc())
         .all()
     )
-    return render_template('leaderboard.html', user_name=user_name,login_success=login_success,users=users)
+    current_time = datetime.now()
+    return render_template('leaderboard.html', user_name=user_name,login_success=login_success,users=users,current_time=current_time)
