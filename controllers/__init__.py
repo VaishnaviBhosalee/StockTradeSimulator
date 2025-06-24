@@ -6,4 +6,6 @@ __all__=["register",
         "research", 
         "trade", 
         "api_quote", 
-        "api_search_symbol"]
+        "api_search_symbol",
+        "execute_trade",
+        "stock_info"]

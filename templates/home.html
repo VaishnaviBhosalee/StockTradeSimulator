@@ -10,11 +10,15 @@
   <div class="stats-card">
     <div class="stat">
       <h4>ACCOUNT VALUE</h4>
-      <p class="value">${{ account_value }}</p>
+      <p class="value">${{ "{:,.2f}".format(account_value) }}</p>
     </div>
     <div class="stat">
       <h4>TODAY'S CHANGE</h4>
-      <p class="change">{{ todays_change }}</p>
+      <p>
+        <span class="{{ 'text-success' if todays_change >= 0 else 'text-danger' }}">
+          ${{ "{:,.2f}".format(todays_change) }}
+        </span>
+      </p>
     </div>
   </div>
 
@@ -26,40 +30,57 @@
 
 <!-- ───────────────────── Holdings Table ───────────────────── -->
 <div class="card mx-auto my-5 text-center" style="width: 80%;">
-    <h5 class="card-title p-3">Holding</h5>
-    <div class="card-body">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Symbol</th>
-                    <th>Description</th>
-                    <th>Purchase Price</th>
-                    <th>Qty</th>
-                    <th>Total Value</th>
-                    <th>Trade Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for stock in stocks %}
-                <tr>
-                    <td>{{ loop.index }}</td>
-                    <td>{{ stock.stock_symbol }}</td>
-                    <td>{{ stock.stock_name }}</td>
-                    <td>${{ "{:,.2f}".format(stock.buy_price_of_user) }}</td>
-                    <td>{{ stock.qty }}</td>
-                    <td>${{ "{:,.2f}".format(stock.total_value) }}</td>
-                    <td>
-                        <a class="btn btn-success btn-sm">Buy More</a>
-                        <a class="btn btn-danger btn-sm">Sell</a>
-                    </td>
-                </tr>
-                {% else %}
-                <tr><td colspan="7">No holdings found.</td></tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+  <h5 class="card-title p-3">Holding</h5>
+  <div class="card-body">
+    <table class="table table-striped table-bordered">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Symbol</th>
+          <th>Description</th>
+          <th>Purchase Price</th>
+          <th>Qty</th>
+          <th>Total Value</th>
+          <th>Trade Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for stock in stocks if stock.status %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td>{{ stock.stock_symbol }}</td>
+          <td>{{ stock.stock_name }}</td>
+          <td>${{ "{:,.2f}".format(stock.buy_price_of_user) }}</td>
+          <td>{{ stock.qty }}</td>
+          <td>${{ "{:,.2f}".format(stock.total_value) }}</td>
+          <td class="d-flex justify-content-center gap-2">
+
+            <!-- Buy Form -->
+            <form method="POST" action="/trade/{{ user_name }}/{{ login_success }}" class="d-inline-flex align-items-center gap-1">
+              <input type="hidden" name="stock_symbol" value="{{ stock.stock_symbol }}">
+              <input type="hidden" name="stock_name" value="{{ stock.stock_name }}">
+              <input type="hidden" name="action" value="buy">
+              <input type="number" name="qty" min="1" value="1" style="width: 60px;" required>
+              <button type="submit" class="btn btn-success btn-sm">Buy</button>
+            </form>
+
+            <!-- Sell Form -->
+            <form method="POST" action="/trade/{{ user_name }}/{{ login_success }}" class="d-inline-flex align-items-center gap-1">
+              <input type="hidden" name="stock_symbol" value="{{ stock.stock_symbol }}">
+              <input type="hidden" name="stock_name" value="{{ stock.stock_name }}">
+              <input type="hidden" name="action" value="sell">
+              <input type="number" name="qty" min="1" value="1" style="width: 60px;" required>
+              <button type="submit" class="btn btn-danger btn-sm">Sell</button>
+            </form>
+
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7">No holdings found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 </div>
 
 <!-- ───────────────────── Chart.js Script ───────────────────── -->
@@ -72,7 +93,7 @@
       labels: ['Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue'],
       datasets: [{
         label: 'Value',
-        data: {{ performance_values | safe }},
+        data: {{ performance_values | default([0, 0, 0, 0, 0, 0, 0]) | safe }},
         borderColor: '#00c8ff',
         backgroundColor: 'rgba(0, 200, 255, 0.2)',
         pointBackgroundColor: '#00c8ff',
