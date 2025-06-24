@@ -1,0 +1,29 @@
+<h2>Trade Preview</h2> 
+<ul>
+    <li><strong>Symbol:</strong> {{ trade.stock_symbol }}</li>
+    <li><strong>Description:</strong> {{ trade.description }}</li>
+    <li><strong>Quantity:</strong> {{ trade.qty }}</li>
+    <li><strong>Total:</strong> ${{ total }}</li>
+    <li><strong>Action:</strong> {{ trade.action }}</li>
+    <li><strong>Duration:</strong> {{ trade.duration }}</li>
+    <li><strong>Order Type:</strong> {{ trade.order_type }}</li>
+</ul>
+
+<!-- Proceed Form -->
+<form action="{{ url_for('confirm_trade') }}" method="POST">
+    {% for key, value in trade.items() %}
+        <input type="hidden" name="{{ key }}" value="{{ value }}">
+    {% endfor %}
+    <input type="hidden" name="total_price" value="{{ total }}">
+    <button type="submit">Proceed</button>
+</form>
+
+<!-- Edit Button -->
+<form action="{{ url_for('trade', user_name=session['username'], login_success='true') }}" method="GET">
+    <button type="submit">Edit</button>
+</form>
+
+<!-- Cancel -->
+<a href="{{ url_for('home', user_name=session['username'], login_success='true') }}">
+    <button>Cancel</button>
+</a>

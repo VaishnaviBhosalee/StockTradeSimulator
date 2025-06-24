@@ -6,7 +6,7 @@
 <h2 style="text-align: center; margin: 20px; padding: 20px;">TRADE PAGE</h2>
 
 <div class="border border-black m-5 mx-auto p-5" style="text-align: center; max-width: 1000px">
-  <form action="/trade" method="POST" id="tradeForm">
+  <form action="{{ url_for('trade_preview') }}" method="POST" id="tradeForm">
     
     <!-- Stock Symbol -->
     <div class="input-group m-4 mx-auto" style="max-width:800px;">
@@ -15,7 +15,7 @@
 
     <!-- Stock Name (Autopopulated) -->
     <div class="input-group m-4 mx-auto" style="max-width:800px;">
-      <input type="text" class="form-control" id="stockName" placeholder="Stock Name (autofilled)" readonly>
+      <input type="text" class="form-control" id="stockName" name="description" placeholder="Stock Name (autofilled)" readonly>
     </div>
 
     <!-- Quantity + Max Label -->
@@ -57,58 +57,9 @@
     </div>
 
     <!-- Submit -->
-    <!-- Button trigger modal -->
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-  Submit
-</button>
-
-<!-- Modal -->
-
-<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="staticBackdropLabel">Trade Confirmation</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <!--message content-->
-        <div class="modal-body">
-          <div class="container-fluid">
-            <div class="row">
-              <div class="col-md-4">.col-md-4</div>
-              <div class="col-md-4 ms-auto">.col-md-4 .ms-auto</div>
-            </div>
-            <div class="row">
-              <div class="col-md-3 ms-auto">.col-md-3 .ms-auto</div>
-              <div class="col-md-2 ms-auto">.col-md-2 .ms-auto</div>
-            </div>
-            <div class="row">
-              <div class="col-md-6 ms-auto">.col-md-6 .ms-auto</div>
-            </div>
-            <div class="row">
-              <div class="col-sm-9">
-                Level 1: .col-sm-9
-                <div class="row">
-                  <div class="col-8 col-sm-6">
-                    Level 2: .col-8 .col-sm-6
-                  </div>
-                  <div class="col-4 col-sm-6">
-                    Level 2: .col-4 .col-sm-6
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-primary">Proceed</button>
-      </div>
+    <div class="m-4">
+      <button type="submit" class="btn btn-primary">Preview</button>
     </div>
-  </div>
-</div>
 
     <!-- Live Price Widget -->
     <div id="livePriceWidget" class="border rounded p-3 mt-4" style="display:none; max-width: 400px; margin:auto;">
@@ -126,13 +77,11 @@
   let ws = null;
   let lastPrice = null;
 
-  // Fetch full company name
   async function fetchStockDetails(symbol) {
     const url = `https://finnhub.io/api/v1/stock/profile2?symbol=${symbol}&token=${finnhubApiKey}`;
     try {
       const res = await fetch(url);
       const data = await res.json();
-
       if (data && data.name) {
         document.getElementById("stockName").value = data.name;
         return true;
@@ -142,32 +91,27 @@
       }
     } catch (err) {
       console.error("Error fetching stock details", err);
-      document.getElementById("stockName").value = "Error";
       return false;
     }
   }
 
-  // Fetch current price for total calculation
   async function fetchStockPrice(symbol) {
     const url = `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${finnhubApiKey}`;
     try {
       const res = await fetch(url);
       const data = await res.json();
-      return parseFloat(data.c) || 0;  // c = current price
+      return parseFloat(data.c) || 0;
     } catch (err) {
       console.error("Error fetching stock price", err);
       return 0;
     }
   }
 
-  // Setup live price WebSocket
   function openWebSocket(symbol) {
     if (ws) ws.close();
 
     ws = new WebSocket(`wss://ws.finnhub.io?token=${finnhubApiKey}`);
-
     ws.onopen = () => {
-      console.log("WebSocket connected");
       ws.send(JSON.stringify({ type: 'subscribe', symbol }));
       document.getElementById("liveSymbol").textContent = `Symbol: ${symbol}`;
       document.getElementById("livePriceWidget").style.display = 'block';
@@ -178,8 +122,10 @@
       if (data.type === "trade" && data.data.length > 0) {
         const price = data.data[0].p;
         const priceElem = document.getElementById("livePrice");
+        const delta = lastPrice && price !== lastPrice;
 
-        if (lastPrice !== null && price !== lastPrice) {
+        // Apply color change
+        if (delta) {
           priceElem.style.color = price > lastPrice ? "green" : "red";
         }
 
@@ -187,36 +133,20 @@
         lastPrice = price;
       }
     };
-
-    ws.onerror = (err) => {
-      console.error("WebSocket error:", err);
-    };
-
-    ws.onclose = () => {
-      console.log("WebSocket closed");
-    };
   }
 
-  // Called when user enters a valid stock symbol
   async function handleSymbolChange(symbol) {
     const valid = await fetchStockDetails(symbol);
     if (!valid) return;
 
     const price = await fetchStockPrice(symbol);
-    if (price === 0) {
-      alert("Failed to fetch live price.");
-      return;
-    }
-
-    lastPrice = price;
-
     const maxQty = Math.floor(bankBalance / price);
     document.getElementById("qtyMaxLabel").innerText = `/ ${maxQty}`;
+    lastPrice = price;
 
     const qtyInput = document.getElementById("qty");
     const totalPriceField = document.getElementById("totalPrice");
 
-    // Reset fields
     qtyInput.value = "";
     totalPriceField.value = "";
 
@@ -233,118 +163,12 @@
     openWebSocket(symbol);
   }
 
-  // Handle symbol input
+  // Bind event once
   document.getElementById("stockSymbol").addEventListener("change", async (e) => {
     const symbol = e.target.value.trim().toUpperCase();
     if (!symbol) return;
     await handleSymbolChange(symbol);
   });
 </script>
-
-
-<!-- <script>
-  const bankBalance = 100000;
-  const twelveDataKey = "83b75dac426e44c89667b743c183c638";  // Replace with your key
-  let lastPrice = null;
-  let ws = null;
-
-  async function fetchStockDetails(symbol) {
-    try {
-      const res = await fetch(`https://api.twelvedata.com/symbol_search?symbol=${symbol}&apikey=${twelveDataKey}`);
-      const data = await res.json();
-
-      if (data && Array.isArray(data.data) && data.data.length > 0) {
-        document.getElementById("stockName").value = data.data[0].instrument_name || "Name not found";
-        return true;
-      } else {
-        document.getElementById("stockName").value = "Invalid Symbol";
-        return false;
-      }
-    } catch (err) {
-      console.error("Error fetching symbol details", err);
-      return false;
-    }
-  }
-
-  async function fetchStockPrice(symbol) {
-    try {
-      const res = await fetch(`https://api.twelvedata.com/price?symbol=${symbol}&apikey=${twelveDataKey}`);
-      const data = await res.json();
-      return parseFloat(data.price) || 0;
-    } catch (err) {
-      console.error("Error fetching price", err);
-      return 0;
-    }
-  }
-
-  function openWebSocket(symbol) {
-    if (ws) ws.close();
-
-    ws = new WebSocket(`wss://ws.twelvedata.com/v1/quotes/price?apikey=${twelveDataKey}`);
-    ws.onopen = () => {
-      ws.send(JSON.stringify({ action: "subscribe", params: { symbols: symbol } }));
-      document.getElementById("liveSymbol").textContent = `Symbol: ${symbol}`;
-      document.getElementById("livePriceWidget").style.display = 'block';
-    };
-
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      if (data && data.price) {
-        const price = parseFloat(data.price);
-        const priceElem = document.getElementById("livePrice");
-
-        if (lastPrice && price !== lastPrice) {
-          priceElem.style.color = price > lastPrice ? "green" : "red";
-        }
-
-        priceElem.textContent = price.toFixed(2);
-        lastPrice = price;
-      }
-    };
-
-    ws.onerror = (err) => {
-      console.error("WebSocket error:", err);
-    };
-
-    ws.onclose = () => {
-      console.log("WebSocket closed");
-    };
-  }
-
-  async function handleSymbolChange(symbol) {
-    const valid = await fetchStockDetails(symbol);
-    if (!valid) return;
-
-    const price = await fetchStockPrice(symbol);
-    const maxQty = Math.floor(bankBalance / price);
-    document.getElementById("qtyMaxLabel").innerText = `/ ${maxQty}`;
-    lastPrice = price;
-
-    const qtyInput = document.getElementById("qty");
-    const totalPriceField = document.getElementById("totalPrice");
-
-    qtyInput.value = "";
-    totalPriceField.value = "";
-
-    qtyInput.oninput = () => {
-      let qty = parseInt(qtyInput.value || 0);
-      if (qty > maxQty) {
-        qty = maxQty;
-        qtyInput.value = qty;
-      }
-      const total = (qty * price).toFixed(2);
-      totalPriceField.value = total;
-    };
-
-    openWebSocket(symbol);
-  }
-
-  document.getElementById("stockSymbol").addEventListener("change", async (e) => {
-    const symbol = e.target.value.trim().toUpperCase();
-    if (!symbol) return;
-    await handleSymbolChange(symbol);
-  });
-</script> -->
-
 
 {% endblock %}
