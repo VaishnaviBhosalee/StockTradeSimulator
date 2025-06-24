@@ -11,7 +11,7 @@ class User(db.Model):
     joined_data = db.Column(db.DateTime, default=datetime.now(timezone.utc))
     display_name = db.Column(db.String(20), unique=True, nullable=False)
     user_finance = db.relationship('UserFinance',backref='uf')
-    user_stock = db.relationship('UserStock',backref='us')
+    user_stock = db.relationship('UserStocks',backref='us')
     
     def __repr__(self):
         return f'<User {self.username}>'
