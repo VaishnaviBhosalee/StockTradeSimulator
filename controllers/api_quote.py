@@ -1,14 +1,22 @@
-from flask import render_template,redirect
-from create_app import app
-from extensions import db
-import requests, os
+# from flask import request, jsonify
+# import requests, os
+# from create_app import app
 
-@app.route('/api/quote')
-def quote():
-    symbol = request.args.get("symbol")
-    r = requests.get(BASE_URL, params={
-        "function": "GLOBAL_QUOTE",
-        "symbol": symbol,
-        "apikey": os.getenv("ALPHA_KEY")
-    }, timeout=10)
-    return jsonify(r.json().get("Global Quote", {}))
+# FINNHUB_KEY = os.getenv("FINNHUB_KEY")
+# BASE_URL = "https://finnhub.io/api/v1"
+
+# @app.route('/api/quote')
+# def quote():
+#     symbol = request.args.get("symbol", "").strip()
+#     if not symbol:
+#         return jsonify({"error": "No symbol provided"}), 400
+
+#     try:
+#         res = requests.get(f"{BASE_URL}/quote", params={
+#             "symbol": symbol,
+#             "token": FINNHUB_KEY
+#         }, timeout=10)
+#         res.raise_for_status()
+#         return jsonify(res.json())
+#     except requests.RequestException as e:
+#         return jsonify({"error": "Request failed", "details": str(e)}), 500

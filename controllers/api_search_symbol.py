@@ -1,29 +1,22 @@
-# controllers/api_search_symbol.py
-
 from flask import request, jsonify
-import requests
-import os
-from create_app import app  # import the central app instance
+import requests, os
+from create_app import app
 
-# Load API key and URL
-ALPHA_KEY = os.getenv("ALPHA_KEY")
-BASE_URL  = "https://www.alphavantage.co/query"
+FINNHUB_KEY = os.getenv("FINNHUB_KEY")
+BASE_URL = "https://finnhub.io/api/v1"
 
 @app.route('/api/search')
 def search_symbol():
-    query = request.args.get("q", "")
+    query = request.args.get("q", "").strip()
     if not query:
         return jsonify({"error": "No query provided"}), 400
 
-    params = {
-        "function": "SYMBOL_SEARCH",
-        "keywords": query,
-        "apikey": ALPHA_KEY
-    }
-
     try:
-        response = requests.get(BASE_URL, params=params)
-        data = response.json()
-        return jsonify(data.get("bestMatches", []))
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        res = requests.get(f"{BASE_URL}/search", params={
+            "q": query,
+            "token": FINNHUB_KEY
+        }, timeout=10)
+        res.raise_for_status()
+        return jsonify(res.json().get("result", []))
+    except requests.RequestException as e:
+        return jsonify({"error": "Request failed", "details": str(e)}), 500
