@@ -13,29 +13,30 @@
 
 <div class="card text-center m-5 border-black">
   <div class="card-body">  
-    <table class="table">
-  <thead>
-    <tr>
-      <th scope="col">Rank</th>
-      <th scope="col">Display Name</th>
-      <th scope="col">Total Value</th>
-      <th scope="col">Today's Change</th>
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th scope="col">Rank</th>
+          <th scope="col">Display Name</th>
+          <th scope="col">Total Value</th>
+          <th scope="col">Today's Change</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in account_balance %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td>{{ item.display_name }}</td>
+          <td>${{ "{:,.2f}".format(item.total_value) }}</td>
+          <td class="{% if item.todays_change > 0 %}text-success{% elif item.todays_change < 0 %}text-danger{% else %}text-muted{% endif %}">
+  ${{ "{:,.2f}".format(item.todays_change) }} 
+  ({{ "{:.2f}".format(item.change_percent) }}%)
+</td>
 
-    </tr>
-  </thead>
-  <tbody>
-  {% for user, total_value in users %}
-  
-  <tr>
-    <td>{{loop.index}}</td>
-    <td>{{ user.display_name }}</td>
-    <td>{{ total_value or 100000 }}</td>
-    <td>{{ user.user_finance[0].todays_change if user.user_finance else 'N/A' }}</td>
-  </tr>
-  
-{% endfor %}
-  </tbody>
-</table>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
     
   </div>
   

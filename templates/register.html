@@ -1,66 +1,35 @@
 {% extends "base.html" %}
 
-
 {% block title %} Register {% endblock %}
 
-
 {% block body %}
-<div class="border border-black m-5 mx-auto p-5" style="text-align: center;max-width: 1000px">
+<div class="form-container">
   <form action="/register" method="POST">
-    <h2>Register page</h2>
+    <h2>Register</h2>
 
-<div class="input-group m-4 mx-auto" style="max-width:800px;">
-  <input type="text" class="form-control" name="user_name" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1">
+    <div class="input-group input-group-custom">
+      <input type="text" class="form-control" name="user_name" placeholder="Username" required>
+    </div>
+
+    <div class="input-group input-group-custom">
+      <input type="email" class="form-control" name="email" placeholder="Email" required>
+    </div>
+
+    <div class="input-group input-group-custom">
+      <input type="password" class="form-control" name="pass_word" placeholder="Password" required>
+    </div>
+
+    <div class="input-group input-group-custom">
+      <input type="text" class="form-control" name="full_name" placeholder="Full Name" required>
+    </div>
+
+    <div class="input-group input-group-custom">
+      <input type="text" class="form-control" name="disp_name" placeholder="Leaderboard Display Name" required>
+    </div>
+
+    <button type="submit" class="btn btn-danger form-button">Register</button>
+    <br>
+    <a href="/login" class="form-link">Login here!</a>
+  </form>
 </div>
-
-<div class="input-group m-4 mx-auto" style="max-width:800px;">
-  <input type="email" class="form-control" name="email" placeholder="Email" aria-label="Email" aria-describedby="basic-addon1">
-</div>
-
-<div class="input-group m-4 mx-auto" style="max-width:800px;">
-  <input type="password" class="form-control" name="pass_word" placeholder="Password" aria-label="Password" aria-describedby="basic-addon1">
-</div>
-
-<div class="input-group m-4 mx-auto" style="max-width:800px;">
-  <input type="text" class="form-control" name="full_name" placeholder="Fullname" aria-label="Fullname" aria-describedby="basic-addon1">
-</div>
-
-<div class="input-group m-4 mx-auto" style="max-width:800px;">
-  <input type="text" class="form-control" name="disp_name" placeholder="Leaderboard Display Name" aria-label="Display Name" aria-describedby="basic-addon1">
-</div>
-
-<button type="submit" class="btn btn-danger">Register</button>
-<br> <br>
-<a href="/login" style="color: orangered; margin: 5px;">Login here!</a>
-</div>
-
-</form>
-<!-- <div class="input-group m-4 mx-auto" style="max-width:800px;">
-  <input type="text" class="form-control" placeholder="Recipient’s username" aria-label="Recipient’s username" aria-describedby="basic-addon2">
-  <span class="input-group-text" id="basic-addon2">@example.com</span>
-</div>
-
-<div class="input-group m-4 mx-auto" style="max-width:800px;">
-  <label for="basic-url" class="form-label">Your vanity URL</label>
-  <div class="input-group">
-    <span class="input-group-text" id="basic-addon3">https://example.com/users/</span>
-    <input type="text" class="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4">
-  </div>
-  
-</div>
-
-<div class="input-group m-4 mx-auto" style="max-width:800px;">
-  <span class="input-group-text">$</span>
-  <input type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
-  <span class="input-group-text">.00</span>
-</div>
-
-<div class="input-group m-4 mx-auto" style="max-width:800px;">
-  <input type="text" class="form-control" placeholder="Username" aria-label="Username">
-  <span class="input-group-text">@</span>
-  <input type="text" class="form-control" placeholder="Server" aria-label="Server">
-</div> -->
-
-
-
 {% endblock %}

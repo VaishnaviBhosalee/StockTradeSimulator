@@ -4,22 +4,32 @@
 {% block body %}
 <h2 class="text-center my-4">TRADE PAGE</h2>
 
-<div class="border p-4 mx-auto" style="max-width: 800px;">
+<div class="trade-container">
   <form id="tradeForm" action="/trade/{{ user_name }}/{{ login_success }}" method="POST">
     <input type="hidden" name="total_price" id="total_price">
 
     <div class="mb-3">
       <input type="text" class="form-control" name="stock_symbol" id="stockSymbol" placeholder="Stock Symbol (e.g. AAPL)" required>
     </div>
-    <div class="mb-3">
-      <input type="text" class="form-control" name="stock_name" id="stockName" placeholder="Stock Name (autofilled)" readonly>
+
+    <!-- Live Price Widget -->
+    <div id="livePriceWidget" class="border rounded p-3 mt-4" style="display:none; max-width: 400px; margin:auto;">
+      <h5 id="liveSymbol">Symbol: --</h5>
+      <p><strong> Live Price: </strong>$<span id="livePrice">--</span></p>
+    </div>
+
+    <!-- Stock Name (Autopopulated) -->
+    <div class="input-group m-4 mx-auto" style="max-width:800px;">
+      <input type="text" class="form-control" id="stockName" placeholder="Stock Name (autofilled)" name="stock_name" readonly>
     </div>
     <div class="mb-3 d-flex">
       <input type="number" class="form-control me-2" name="qty" id="qty" placeholder="Quantity" min="1" required>
       <span class="input-group-text" id="qtyMaxLabel">/ --</span>
     </div>
-    <div class="mb-3">
-      <input type="text" class="form-control" id="totalPrice" placeholder="Total Price" readonly>
+
+    <!-- Total Price -->
+    <div class="input-group m-4 mx-auto" style="max-width:800px;">
+      <input type="text" class="form-control" id="totalPrice" name="total_price" placeholder="Total Price (autofilled)" readonly>
     </div>
     <div class="mb-3">
       <select class="form-select" name="action" id="action" required>
@@ -46,11 +56,11 @@
     <button type="submit" class="btn btn-primary w-100">Confirm Trade</button>
   </form>
 
-  <div id="livePriceWidget" class="border rounded p-3 mt-4 text-center" style="display:none;">
-    <h5 id="liveSymbol">Symbol: --</h5>
-    <p><strong>Live Price:</strong> $<span id="livePrice">--</span></p>
-  </div>
+  </form>
 </div>
+
+
+
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {

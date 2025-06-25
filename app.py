@@ -55,6 +55,7 @@ def quote():
 
     except requests.exceptions.RequestException as e:
         return jsonify({"error": "Request failed", "details": str(e)}), 500
+    
 
 
 import os

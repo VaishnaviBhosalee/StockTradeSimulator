@@ -1,6 +1,7 @@
 from extensions import db
 from datetime import datetime, timezone
-
+from models.user_finance import UserFinance
+from models.user_stocks import UserStocks
 class User(db.Model):
     __tablename__='users'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)

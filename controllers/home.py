@@ -28,6 +28,12 @@ def home(user_name, login_success):
         if stock.status:
             live_quote = f_client.quote(stock.stock_symbol)
             current_price = live_quote.get('c', stock.buy_price_of_user)
+            change = live_quote.get('d', 0.0)
+            percent_change = live_quote.get('dp', 0.0)
+
+            stock.current_price = round(current_price, 2)
+            stock.price_change = round(change, 2)
+            stock.percent_change = round(percent_change, 2)
             stock.total_value = round(current_price * stock.qty, 2)
             total_portfolio_value += stock.total_value
     db.session.commit()
