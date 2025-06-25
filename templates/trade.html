@@ -13,9 +13,15 @@
       <input type="text" class="form-control" id="stockSymbol" name="stock_symbol" placeholder="Stock Symbol (e.g. NVDA, AAPL)" aria-label="Stock Symbol">
     </div>
 
+    <!-- Live Price Widget -->
+    <div id="livePriceWidget" class="border rounded p-3 mt-4" style="display:none; max-width: 400px; margin:auto;">
+      <h5 id="liveSymbol">Symbol: --</h5>
+      <p><strong> Live Price: </strong>$<span id="livePrice">--</span></p>
+    </div>
+
     <!-- Stock Name (Autopopulated) -->
     <div class="input-group m-4 mx-auto" style="max-width:800px;">
-      <input type="text" class="form-control" id="stockName" placeholder="Stock Name (autofilled)" readonly>
+      <input type="text" class="form-control" id="stockName" placeholder="Stock Name (autofilled)" name="stock_name" readonly>
     </div>
 
     <!-- Quantity + Max Label -->
@@ -26,7 +32,7 @@
 
     <!-- Total Price -->
     <div class="input-group m-4 mx-auto" style="max-width:800px;">
-      <input type="text" class="form-control" id="totalPrice" placeholder="Total Price (autofilled)" readonly>
+      <input type="text" class="form-control" id="totalPrice" name="total_price" placeholder="Total Price (autofilled)" readonly>
     </div>
 
     <!-- Action -->
@@ -61,14 +67,11 @@
       <button type="submit" class="btn btn-primary">Submit Order</button>
     </div>
 
-    <!-- Live Price Widget -->
-    <div id="livePriceWidget" class="border rounded p-3 mt-4" style="display:none; max-width: 400px; margin:auto;">
-      <h5 id="liveSymbol">Symbol: --</h5>
-      <p><strong>Live Price:</strong> $<span id="livePrice">--</span></p>
-    </div>
-
   </form>
 </div>
+
+
+
 
 <script>
   const bankBalance = 100000;
