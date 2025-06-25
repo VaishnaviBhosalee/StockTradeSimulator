@@ -13,7 +13,7 @@ def login():
         user=User.query.filter(User.username==user_user_name,User.password==user_pass_word).first()
 
         if user:
-            url = url_for('home', user_name=user.username, login_success=True,current_time=current_time)
+            url = url_for('home', user_name=user.username, login_success=True)
             return redirect(url)
         else:
             return render_template('login.html', login_success1=False,current_time=current_time)

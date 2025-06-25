@@ -2,6 +2,7 @@
 env/
 venv/
 .env
+config
 
 # Bytecode and cache
 __pycache__/
