@@ -3,6 +3,7 @@ from models.user import User
 from models.user_finance import UserFinance
 from models.user_stocks import UserStocks
 from models.portfolio_history import PortfolioHistory
+from models.transaction_history import TransactionHistory
 from datetime import datetime, date
 from extensions import db
 from create_app import app
@@ -38,8 +39,10 @@ def trade(user_name, login_success):
             message = f"Could not fetch price for {symbol}."
             return render_template('trade.html', **locals())
 
-        total = qty * current_price
+        total = round(qty * current_price, 2)
         stock = UserStocks.query.filter_by(user_id=user.id, stock_symbol=symbol).first()
+
+        profit = 0.0
 
         if action == 'buy':
             if total > finance.current_balance:
@@ -50,7 +53,6 @@ def trade(user_name, login_success):
             finance.todays_change -= total
 
             if stock:
-                # Calculate average buy price
                 old_qty = stock.qty
                 stock.qty += qty
                 stock.total_value += total
@@ -73,6 +75,9 @@ def trade(user_name, login_success):
                 message = "Not enough stock to sell."
                 return render_template('trade.html', **locals())
 
+            # Calculate profit
+            profit = round((current_price - stock.buy_price_of_user) * qty, 2)
+
             stock.qty -= qty
             stock.total_value -= total
             finance.current_balance += total
@@ -80,6 +85,19 @@ def trade(user_name, login_success):
 
             if stock.qty == 0:
                 stock.status = False
+
+        # ✅ Add transaction history
+        transaction = TransactionHistory(
+            user_id=user.id,
+            stock_symbol=symbol,
+            stock_name=stock_name or symbol,
+            action=action,
+            qty=qty,
+            price=round(current_price, 2),
+            total=total,
+            profit=profit if action == "sell" else 0.0
+        )
+        db.session.add(transaction)
 
         finance.last_updated = datetime.utcnow()
         db.session.commit()
@@ -91,7 +109,7 @@ def trade(user_name, login_success):
         db.session.commit()
 
         return redirect(url_for('home', user_name=user_name, login_success=login_success))
-
+    
     return render_template('trade.html',
                            user_name=user_name,
                            login_success=login_success,
