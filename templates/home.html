@@ -92,6 +92,47 @@
     </table>
   </div>
 </div>
+<!-- ───────────────────── Transaction History Table ───────────────────── -->
+<div class="card mx-auto my-5 text-center" style="width: 80%;">
+  <h5 class="card-title p-3">Transaction History</h5>
+  <div class="card-body">
+    <table class="table table-striped table-bordered">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Date</th>
+          <th>Action</th>
+          <th>Symbol</th>
+          <th>Description</th>
+          <th>Qty</th>
+          <th>Price</th>
+          <th>Total</th>
+          <th>Profit</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for txn in transactions %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td>{{ txn.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+          <td><span class="badge bg-{{ 'success' if txn.action == 'buy' else 'danger' }}">{{ txn.action.upper() }}</span></td>
+          <td>{{ txn.stock_symbol }}</td>
+          <td>{{ txn.stock_name }}</td>
+          <td>{{ txn.qty }}</td>
+          <td>${{ "{:,.2f}".format(txn.price) }}</td>
+          <td>${{ "{:,.2f}".format(txn.total) }}</td>
+          <td class="{{ 'text-success' if txn.profit >= 0 else 'text-danger' }}">
+            ${{ "{:,.2f}".format(txn.profit) }}
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="9">No transactions found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
 
 <!-- ───────────────────── Chart.js Script ───────────────────── -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
