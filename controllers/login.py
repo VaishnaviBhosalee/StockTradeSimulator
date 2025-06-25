@@ -18,15 +18,7 @@ def login():
         ).first()
 
         if user:
-<<<<<<< HEAD
-            # ✅ Set session variables
-            session['username'] = user.username
-            session['user_id'] = user.id
-
-            url = url_for('home', user_name=user.username, login_success=True, current_time=current_time)
-=======
             url = url_for('home', user_name=user.username, login_success=True)
->>>>>>> 164942f4d7957b0705a6eb00098c5f25bbdb760b
             return redirect(url)
         else:
             return render_template('login.html', login_success1=False, current_time=current_time)
