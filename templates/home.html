@@ -12,7 +12,7 @@
       <h4>ACCOUNT VALUE</h4>
       <p class="value">${{ "{:,.2f}".format(account_value) }}</p>
     </div>
-    <div class="stat">
+    <div class="stat">    
       <h4>TODAY'S CHANGE</h4>
       <p>
         <span class="{{ 'text-success' if todays_change >= 0 else 'text-danger' }}">
@@ -42,6 +42,10 @@
           <th>Qty</th>
           <th>Total Value</th>
           <th>Trade Actions</th>
+          <th>Current Price</th>
+          <th>Change</th>
+          <th>% Change</th>
+
         </tr>
       </thead>
       <tbody>
@@ -72,11 +76,17 @@
               <input type="number" name="qty" min="1" value="1" style="width: 60px;" required>
               <button type="submit" class="btn btn-danger btn-sm">Sell</button>
             </form>
+            </td>
 
-          </td>
+            <td id="price-{{ stock.stock_symbol }}">$0.00</td>
+            <td id="change-{{ stock.stock_symbol }}">0.00</td>
+            <td id="percent-{{ stock.stock_symbol }}">0.00%</td>
+
+
+          
         </tr>
         {% else %}
-        <tr><td colspan="7">No holdings found.</td></tr>
+        <tr><td colspan="10">No holdings found.</td></tr>
         {% endfor %}
       </tbody>
     </table>
@@ -113,6 +123,24 @@
       }
     }
   });
+    async function fetchQuote(symbol) {
+    const response = await fetch(`/api/quote?symbol=${symbol}`);
+    const data = await response.json();
+
+    if (data.error) {
+      console.error("Error:", data.error);
+    } else {
+      document.getElementById(`price-${symbol}`).textContent = `$${data.c.toFixed(2)}`;
+      document.getElementById(`change-${symbol}`).textContent = `${data.d.toFixed(2)}`;
+      document.getElementById(`percent-${symbol}`).textContent = `${data.dp.toFixed(2)}%`;
+    }
+  }
+
+  // Fetch every 10 seconds (adjust if needed)
+  const symbols = {{ stocks | map(attribute='stock_symbol') | list | tojson }};
+  setInterval(() => {
+    symbols.forEach(symbol => fetchQuote(symbol));
+  }, 10000);
 </script>
 
 {% endblock %}
