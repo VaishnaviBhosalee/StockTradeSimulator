@@ -1,51 +1,102 @@
-from flask import render_template, redirect, request, url_for, session
-from create_app import app
-from extensions import db
-from datetime import datetime
+from flask import render_template, redirect, url_for, request
+from models.user import User
+from models.user_finance import UserFinance
 from models.user_stocks import UserStocks
+from models.portfolio_history import PortfolioHistory
+from datetime import datetime, date
+from extensions import db
+from create_app import app
+import finnhub
 
+f_client = finnhub.Client(api_key=app.config['FINNHUB_API_KEY'])
 
-@app.route('/trade/<user_name>/<login_success>')
+@app.route('/trade/<user_name>/<login_success>', methods=['GET', 'POST'])
 def trade(user_name, login_success):
-    current_time = datetime.now()
-    return render_template('trade.html', user_name=user_name, login_success=login_success, current_time=current_time)
+    user = User.query.filter_by(username=user_name).first_or_404()
+    finance = UserFinance.query.filter_by(user_id=user.id).first_or_404()
 
+    message = ''
+    current_price = 0
+    symbol = ''
+    stock_name = ''
 
-# Show preview of trade
-@app.route('/trade/preview', methods=['POST'])
-def trade_preview():
-    trade_data = request.form.to_dict()
+    if request.method == 'POST':
+        symbol = request.form.get('stock_symbol', '').upper()
+        action = request.form.get('action', '').lower()
+        stock_name = request.form.get('stock_name', '')
 
-    # Debug: print keys for confirmation
-    print("Received trade data:", trade_data)
+        try:
+            qty = int(request.form.get('qty'))
+        except (ValueError, TypeError):
+            message = 'Invalid quantity.'
+            return render_template('trade.html', **locals())
 
-    try:
-        total = round(float(trade_data.get('total_price', 0)), 2)
-    except:
-        total = 0
+        # Fetch live stock price
+        live_quote = f_client.quote(symbol)
+        current_price = live_quote.get('c', 0)
+        if current_price == 0:
+            message = f"Could not fetch price for {symbol}."
+            return render_template('trade.html', **locals())
 
-    return render_template('preview.html', trade=trade_data, total=total)
+        total = qty * current_price
+        stock = UserStocks.query.filter_by(user_id=user.id, stock_symbol=symbol).first()
 
+        if action == 'buy':
+            if total > finance.current_balance:
+                message = "Not enough balance to buy."
+                return render_template('trade.html', **locals())
 
-# Final confirmation and saving to DB
-@app.route('/trade/confirm', methods=['POST'])
-def confirm_trade():
-    trade = request.form
-    print("Confirming trade data:", dict(trade))  # Debug
+            finance.current_balance -= total
+            finance.todays_change -= total
 
-    user_id = session.get('user_id')  # ensure set during login
+            if stock:
+                # Calculate average buy price
+                old_qty = stock.qty
+                stock.qty += qty
+                stock.total_value += total
+                stock.buy_price_of_user = ((stock.buy_price_of_user * old_qty) + (current_price * qty)) / stock.qty
+                stock.status = True
+            else:
+                stock = UserStocks(
+                    user_id=user.id,
+                    stock_symbol=symbol,
+                    stock_name=stock_name or symbol,
+                    qty=qty,
+                    buy_price_of_user=current_price,
+                    total_value=total,
+                    status=True
+                )
+                db.session.add(stock)
 
-    user_stock = UserStocks(
-        user_id=user_id,
-        stock_name=trade.get('description'),
-        stock_symbol=trade.get('stock_symbol', '').upper(),
-        buy_price_of_user=float(trade.get('total_price', 0)) / int(trade.get('qty', 1)),
-        qty=int(trade.get('qty', 0)),
-        total_value=float(trade.get('total_price', 0)),
-        status=True
-    )
+        elif action == 'sell':
+            if not stock or qty > stock.qty:
+                message = "Not enough stock to sell."
+                return render_template('trade.html', **locals())
 
-    db.session.add(user_stock)
-    db.session.commit()
+            stock.qty -= qty
+            stock.total_value -= total
+            finance.current_balance += total
+            finance.todays_change += total
 
-    return redirect(url_for('home', user_name=session['username'], login_success='true'))
+            if stock.qty == 0:
+                stock.status = False
+
+        finance.last_updated = datetime.utcnow()
+        db.session.commit()
+
+        # Update portfolio history
+        total_port = finance.current_balance + sum(s.total_value for s in user.user_stocks if s.status)
+        hist = PortfolioHistory(user_id=user.id, date=date.today(), value=total_port)
+        db.session.add(hist)
+        db.session.commit()
+
+        return redirect(url_for('home', user_name=user_name, login_success=login_success))
+
+    return render_template('trade.html',
+                           user_name=user_name,
+                           login_success=login_success,
+                           bank_balance=finance.current_balance,
+                           symbol=symbol,
+                           stock_name=stock_name,
+                           current_price=current_price,
+                           message=message)
