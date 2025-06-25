@@ -8,7 +8,7 @@ from models.user_finance import UserFinance
 from models.portfolio_history import PortfolioHistory
 from models.transaction_history import TransactionHistory
 import finnhub
-transactions = TransactionHistory.query.filter_by(user_id=user.id).order_by(TransactionHistory.timestamp.desc()).all()
+
 f_client = finnhub.Client(api_key=app.config['FINNHUB_API_KEY'])
 
 @app.route('/home/<user_name>/<login_success>')
@@ -16,7 +16,7 @@ def home(user_name, login_success):
     user = User.query.filter_by(username=user_name).first_or_404()
     stocks = user.user_stocks
     finance = UserFinance.query.filter_by(user_id=user.id).first()
-
+    transactions = TransactionHistory.query.filter_by(user_id=user.id).order_by(TransactionHistory.timestamp.desc()).all()
 
     if finance is None:
         finance = UserFinance(user_id=user.id, current_balance=100000, todays_change=0.0)
