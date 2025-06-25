@@ -8,7 +8,8 @@
 
       <!-- Symbol Search -->
       <div class="research-search-bar">
-          <input type="text" id="searchInput" placeholder="Enter stock symbol (e.g. NVDA, AAPL)" />
+          <input type="text" id="searchInput" placeholder="e.g. NVDA, AAPL" aria-label="Stock symbol" />
+
           <button id="research-button" onclick="search()">Search</button>
       </div>
 
@@ -120,19 +121,23 @@
                       document.getElementById("priceChart").style.display = "block";
                       if (window.myChart) window.myChart.destroy();
 
-                      window.myChart = new Chart(ctx, {
-                          type: 'line',
-                          data: {
-                              labels: labels,
-                              datasets: [{
-                                  label: `${symbol} Closing Prices`,
-                                  data: prices,
-                                  borderColor: 'blue',
-                                  backgroundColor: 'rgba(0, 0, 255, 0.1)',
-                                  fill: true,
-                                  tension: 0.3
-                              }]
-                          },
+                        const color = quote.d >= 0 ? 'green' : 'red';
+                        const bgColor = quote.d >= 0 ? 'rgba(0, 128, 0, 0.1)' : 'rgba(255, 0, 0, 0.1)';
+
+                        window.myChart = new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: labels,
+                                datasets: [{
+                                    label: `${symbol} Closing Prices`,
+                                    data: prices,
+                                    borderColor: color,
+                                    backgroundColor: bgColor,
+                                    fill: true,
+                                    tension: 0.3
+                                }]
+                            },
+
                           options: {
                               responsive: true,
                               scales: {

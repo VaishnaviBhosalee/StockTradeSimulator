@@ -4,7 +4,7 @@
 {% block body %}
 <h2 class="text-center my-4">TRADE PAGE</h2>
 
-<div class="border p-4 mx-auto" style="max-width: 800px;">
+<div class="trade-container">
   <form id="tradeForm" action="/trade/{{ user_name }}/{{ login_success }}" method="POST">
     <input type="hidden" name="total_price" id="total_price">
 
