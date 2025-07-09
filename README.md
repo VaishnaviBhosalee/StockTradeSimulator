@@ -1,7 +1,3 @@
-Here's a well-structured and informative `README.md` for your **Stock Trading Simulator** project:
-
----
-
 # 📈 Stock Trading Simulator
 
 An interactive stock trading simulator that empowers users to learn market dynamics and trading strategies using **virtual currency**—all in a risk-free environment. Users can buy/sell mock stocks based on **real or delayed stock market data**, track portfolio performance, view transaction history, and compete on a **global leaderboard**.
@@ -28,13 +24,11 @@ This project simulates a real-world trading platform with educational value, com
 
 | Layer              | Tools Used                                                                                |
 | ------------------ | ----------------------------------------------------------------------------------------- |
-| **Frontend**       | React / HTML + Tailwind / Chart.js / D3.js                                                |
-| **Backend**        | Flask / Node.js / Django                                                                  |
-| **APIs**           | [Twelve Data](https://twelvedata.com/), [Finnhub](https://finnhub.io/), Yahoo Finance API |
-| **Database**       | PostgreSQL / MongoDB / SQLite                                                             |
-| **Authentication** | Flask-Login / JWT / OAuth                                                                 |
-| **Deployment**     | Render / Heroku / Vercel / Docker                                                         |
-
+| **Frontend**       | HTML + CSS + Bootstrap, Jinjja2 for templating                                                |
+| **Backend**        | Flask                                                                  |
+| **APIs**           | [Trading View](https://www.tradingview.com/), [Finnhub](https://finnhub.io/) |
+| **Database**       | SQLite / SQLAlchemy                                                             |
+| **Deployment**     | Netlify
 ---
 
 ## 🛠️ Installation
@@ -42,8 +36,8 @@ This project simulates a real-world trading platform with educational value, com
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/yourusername/stock-trading-simulator.git
-   cd stock-trading-simulator
+   git clone https://github.com/VaishnaviBhosalee/StockTradeSimulator.git
+   cd StockTradeSimulator
    ```
 
 2. **Set up environment**
@@ -51,21 +45,19 @@ This project simulates a real-world trading platform with educational value, com
    * Create a `.env` file and add your API keys:
 
      ```
-     TWELVE_DATA_API_KEY=your_api_key
+     FINNHUB_KEY=your_api_key
      ```
 
 3. **Install dependencies**
 
    ```bash
-   pip install -r requirements.txt  # for Flask backend
-   npm install                      # for React frontend (if applicable)
+   pip install -r requirements.txt  # for Flask backend)
    ```
 
 4. **Run the project**
 
    ```bash
    flask run        # Backend
-   npm start        # Frontend
    ```
 
 ---
@@ -80,41 +72,10 @@ This project simulates a real-world trading platform with educational value, com
 
 ---
 
-## 📉 Sample Visualizations
-
-* Portfolio Pie Chart
-* Stock Price Line Graph
-* Profit/Loss Bar Chart
-
-*(Use Chart.js or D3 for dynamic charts)*
-
----
-
 ## 🔐 Security Considerations
 
 * Prevent over-buying or invalid trades
 * Sanitize all user inputs
 * Secure API keys using environment variables
-* Store user data with hashed credentials
 
 ---
-
-## 🤝 Contributing
-
-We welcome contributions! Submit pull requests, report bugs, or suggest features in the [Issues](https://github.com/yourusername/stock-trading-simulator/issues) section.
-
----
-
-## 📜 License
-
-MIT License
-
----
-
-## 📬 Contact
-
-For suggestions, reach out via [email@example.com](mailto:email@example.com) or open an issue on GitHub.
-
----
-
-Let me know if you'd like a version tailored to Flask, Django, or React-specific setups!
