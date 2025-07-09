@@ -51,13 +51,13 @@ This project simulates a real-world trading platform with educational value, com
 3. **Install dependencies**
 
    ```bash
-   pip install -r requirements.txt  # for Flask backend)
+   pip install -r requirements.txt
    ```
 
 4. **Run the project**
 
    ```bash
-   flask run        # Backend
+   flask run
    ```
 
 ---
