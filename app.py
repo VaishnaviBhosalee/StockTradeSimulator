@@ -24,10 +24,6 @@ def landingPage():
     return render_template('landing_page.html')
 
 
-from flask import request, jsonify
-import requests, os
-from create_app import app
-
 FINNHUB_KEY = os.getenv("FINNHUB_KEY")
 BASE_URL = "https://finnhub.io/api/v1"
 
@@ -57,10 +53,6 @@ def quote():
         return jsonify({"error": "Request failed", "details": str(e)}), 500
     
 
-
-import os
-import requests
-from flask import request, jsonify
 
 @app.route('/api/chart')
 def chart():
