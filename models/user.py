@@ -9,7 +9,7 @@ class User(db.Model):
     email = db.Column(db.String(50), unique=True, nullable=False)
     password = db.Column(db.String(20), nullable=False)
     fullname = db.Column(db.String(100), nullable=False)
-    joined_data = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    joined_data = db.Column(db.DateTime, default=datetime.now())
     display_name = db.Column(db.String(20), unique=True, nullable=False)
     first_login = db.Column(db.Boolean, default=True, nullable=False)
     user_finance = db.relationship('UserFinance',backref='uf')

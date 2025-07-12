@@ -4,7 +4,7 @@ from models.user_finance import UserFinance
 from models.user_stocks import UserStocks
 from models.portfolio_history import PortfolioHistory
 from models.transaction_history import TransactionHistory
-from datetime import datetime, date
+from datetime import datetime, timezone
 from extensions import db
 from create_app import app
 import finnhub
@@ -99,14 +99,15 @@ def trade(user_name, login_success):
         )
         db.session.add(transaction)
 
-        finance.last_updated = datetime.utcnow()
+        finance.last_updated = datetime.now()
         db.session.commit()
 
         # Update portfolio history
         total_port = finance.current_balance + sum(s.total_value for s in user.user_stocks if s.status)
-        hist = PortfolioHistory(user_id=user.id, date=datetime.today(), value=total_port)
+        hist = PortfolioHistory(user_id=user.id, date=datetime.now(), value=total_port)
         db.session.add(hist)
         db.session.commit()
+        print(hist.date)
 
         return redirect(url_for('home', user_name=user_name, login_success=login_success))
     

@@ -41,7 +41,7 @@ def home(user_name, login_success):
             total_portfolio_value += stock.total_value
     db.session.commit()
 
-    today = date.today()
+    today = datetime.today().date()
     existing_entry = PortfolioHistory.query.filter_by(user_id=user.id, date=today).first()
     if not existing_entry:
         history = PortfolioHistory(user_id=user.id, date=today, value=round(total_portfolio_value, 2))

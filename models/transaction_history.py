@@ -14,7 +14,7 @@ class TransactionHistory(db.Model):
     price = db.Column(db.Float, nullable=False)
     total = db.Column(db.Float, nullable=False)
     profit = db.Column(db.Float, default=0.0)  # Only for 'sell'
-    timestamp = db.Column(db.DateTime, default= datetime.now(timezone.utc))
+    timestamp = db.Column(db.DateTime, default= datetime.now())
 
     def __repr__(self):
         return f"<Transaction {self.id} - {self.action.upper()} {self.stock_symbol}>"
