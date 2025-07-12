@@ -350,3 +350,25 @@ button {
   max-width: 500px;
   margin: 0 auto 20px auto;
 }
+
+/* ─────────────── Tooltip Custom Styling ─────────────── */
+.tooltip-inner {
+  background-color: #2e77c0 !important; /* Dark background */
+  color: #fff !important;               /* White text */
+  font-size: 0.95rem;                   /* Slightly larger text */
+  padding: 8px 12px;
+  border-radius: 6px;
+  max-width: 250px;
+  text-align: left;
+}
+
+/* Tooltip arrow matches background */
+.bs-tooltip-top .tooltip-arrow::before,
+.bs-tooltip-bottom .tooltip-arrow::before,
+.bs-tooltip-start .tooltip-arrow::before,
+.bs-tooltip-end .tooltip-arrow::before {
+  border-top-color: #343a40 !important;
+  border-bottom-color: #343a40 !important;
+  border-left-color: #343a40 !important;
+  border-right-color: #343a40 !important;
+}

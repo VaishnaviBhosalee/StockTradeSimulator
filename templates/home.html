@@ -5,6 +5,44 @@
 {% block body %}
 <h2 style="text-align: center;margin:50px;">HOME PAGE</h2>
 
+{% if first_login %}
+<div class="modal fade" id="tutorialModal" tabindex="-1" aria-labelledby="tutorialModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-3">
+      <div class="modal-header">
+        <h5 class="modal-title" id="tutorialModalLabel">Welcome to Your Dashboard 🎉</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Tutorial Step Content -->
+        <div class="tutorial-step" id="step-1">
+          <p>👋 You've been credited with <strong>$100,000</strong> virtual money to begin your trading journey.</p>
+        </div>
+        <div class="tutorial-step d-none" id="step-2">
+          <p>📊 Check your account value and daily changes on the dashboard overview.</p>
+        </div>
+        <div class="tutorial-step d-none" id="step-3">
+          <p>📈 View your holdings, current prices, and place Buy/Sell orders.</p>
+        </div>
+        <div class="tutorial-step d-none" id="step-4">
+          <p>🕒 Monitor your performance and check detailed transaction history.</p>
+        </div>
+      </div>
+
+      <div class="modal-footer justify-content-between">
+        <button class="btn btn-secondary" id="skipTutorial">Skip</button>
+        <div>
+          <button class="btn btn-outline-primary" id="prevBtn" disabled>Previous</button>
+          <button class="btn btn-primary" id="nextBtn">Next</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+
 <!-- ───────────────────── Account Overview ───────────────────── -->
 <div class="dashboard-container">
   <div class="stats-card">
@@ -57,26 +95,30 @@
           <td>${{ "{:,.2f}".format(stock.buy_price_of_user) }}</td>
           <td>{{ stock.qty }}</td>
           <td>${{ "{:,.2f}".format(stock.total_value) }}</td>
-          <td class="d-flex justify-content-center gap-2">
+<td class="text-center align-middle">
+  <div class="d-flex justify-content-center align-items-center gap-2">
+    <!-- Buy Form -->
+    <form method="POST" action="/trade/{{ user_name }}/{{ login_success }}"
+          class="d-flex align-items-center gap-1 mb-0">
+      <input type="hidden" name="stock_symbol" value="{{ stock.stock_symbol }}">
+      <input type="hidden" name="stock_name" value="{{ stock.stock_name }}">
+      <input type="hidden" name="action" value="buy">
+      <input type="number" name="qty" min="1" value="1" class="form-control form-control-sm" style="width: 60px;" required>
+      <button type="submit" class="btn btn-success btn-sm">Buy</button>
+    </form>
 
-            <!-- Buy Form -->
-            <form method="POST" action="/trade/{{ user_name }}/{{ login_success }}" class="d-inline-flex align-items-center gap-1">
-              <input type="hidden" name="stock_symbol" value="{{ stock.stock_symbol }}">
-              <input type="hidden" name="stock_name" value="{{ stock.stock_name }}">
-              <input type="hidden" name="action" value="buy">
-              <input type="number" name="qty" min="1" value="1" style="width: 60px;" required>
-              <button type="submit" class="btn btn-success btn-sm">Buy</button>
-            </form>
+    <!-- Sell Form -->
+    <form method="POST" action="/trade/{{ user_name }}/{{ login_success }}"
+          class="d-flex align-items-center gap-1 mb-0">
+      <input type="hidden" name="stock_symbol" value="{{ stock.stock_symbol }}">
+      <input type="hidden" name="stock_name" value="{{ stock.stock_name }}">
+      <input type="hidden" name="action" value="sell">
+      <input type="number" name="qty" min="1" value="1" class="form-control form-control-sm" style="width: 60px;" required>
+      <button type="submit" class="btn btn-danger btn-sm">Sell</button>
+    </form>
+  </div>
+</td>
 
-            <!-- Sell Form -->
-            <form method="POST" action="/trade/{{ user_name }}/{{ login_success }}" class="d-inline-flex align-items-center gap-1">
-              <input type="hidden" name="stock_symbol" value="{{ stock.stock_symbol }}">
-              <input type="hidden" name="stock_name" value="{{ stock.stock_name }}">
-              <input type="hidden" name="action" value="sell">
-              <input type="number" name="qty" min="1" value="1" style="width: 60px;" required>
-              <button type="submit" class="btn btn-danger btn-sm">Sell</button>
-            </form>
-            </td>
 
             <td id="price-{{ stock.stock_symbol }}">$0.00</td>
             <td id="change-{{ stock.stock_symbol }}">0.00</td>
@@ -92,6 +134,7 @@
     </table>
   </div>
 </div>
+
 <!-- ───────────────────── Transaction History Table ───────────────────── -->
 <div class="card mx-auto my-5 text-center" style="width: 80%;">
   <h5 class="card-title p-3">Transaction History</h5>
@@ -141,10 +184,10 @@
   new Chart(ctx, {
     type: 'line',
     data: {
-      labels: ['Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue'],
+      labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
       datasets: [{
         label: 'Value',
-        data: {{ performance_values | default([0, 0, 0, 0, 0, 0, 0]) | safe }},
+        data: {{ performance_values | default([0, 0, 0, 0, 0]) | safe }},
         borderColor: '#00c8ff',
         backgroundColor: 'rgba(0, 200, 255, 0.2)',
         pointBackgroundColor: '#00c8ff',
@@ -183,5 +226,52 @@
     symbols.forEach(symbol => fetchQuote(symbol));
   }, 10000);
 </script>
+
+{% if first_login %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const tutorialModal = new bootstrap.Modal(document.getElementById('tutorialModal'));
+    tutorialModal.show();
+
+    const steps = document.querySelectorAll('.tutorial-step');
+    let currentStep = 0;
+
+    const nextBtn = document.getElementById('nextBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const skipBtn = document.getElementById('skipTutorial');
+
+    function updateStep() {
+      steps.forEach((step, i) => {
+        step.classList.toggle('d-none', i !== currentStep);
+      });
+      prevBtn.disabled = currentStep === 0;
+      nextBtn.textContent = currentStep === steps.length - 1 ? 'Finish' : 'Next';
+    }
+
+    nextBtn.addEventListener('click', () => {
+      if (currentStep < steps.length - 1) {
+        currentStep++;
+        updateStep();
+      } else {
+        tutorialModal.hide();
+      }
+    });
+
+    prevBtn.addEventListener('click', () => {
+      if (currentStep > 0) {
+        currentStep--;
+        updateStep();
+      }
+    });
+
+    skipBtn.addEventListener('click', () => {
+      tutorialModal.hide();
+    });
+
+    updateStep();
+  });
+</script>
+{% endif %}
+
 
 {% endblock %}
