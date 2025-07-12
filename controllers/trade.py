@@ -104,7 +104,7 @@ def trade(user_name, login_success):
 
         # Update portfolio history
         total_port = finance.current_balance + sum(s.total_value for s in user.user_stocks if s.status)
-        hist = PortfolioHistory(user_id=user.id, date=date.today(), value=total_port)
+        hist = PortfolioHistory(user_id=user.id, date=datetime.today(), value=total_port)
         db.session.add(hist)
         db.session.commit()
 
