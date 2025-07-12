@@ -11,6 +11,7 @@ class User(db.Model):
     fullname = db.Column(db.String(100), nullable=False)
     joined_data = db.Column(db.DateTime, default=datetime.now(timezone.utc))
     display_name = db.Column(db.String(20), unique=True, nullable=False)
+    first_login = db.Column(db.Boolean, default=True, nullable=False)
     user_finance = db.relationship('UserFinance',backref='uf')
     user_stocks = db.relationship('UserStocks',backref='us')
     

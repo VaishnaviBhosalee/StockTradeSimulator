@@ -29,38 +29,106 @@
 
     <!-- Total Price -->
     <div class="input-group m-4 mx-auto" style="max-width:800px;">
-      <input type="text" class="form-control" id="totalPrice" name="total_price" placeholder="Total Price (autofilled)" readonly>
-    </div>
-    <div class="mb-3">
-      <select class="form-select" name="action" id="action" required>
-        <option value="" disabled selected>Action</option>
-        <option value="buy">Buy</option>
-        <option value="sell">Sell</option>
-      </select>
-    </div>
-    <div class="mb-3">
-      <select class="form-select" name="duration" id="duration" required>
-        <option value="" disabled selected>Duration</option>
-        <option value="intraday">Intraday</option>
-        <option value="longterm">Long Term</option>
-      </select>
-    </div>
-    <div class="mb-3">
-      <select class="form-select" name="order_type" id="order_type" required>
-        <option value="" disabled selected>Order Type</option>
-        <option value="market">Market</option>
-        <option value="limit">Limit</option>
-      </select>
-    </div>
+  <input type="text" class="form-control" id="totalPrice" name="total_price" placeholder="Total Price (autofilled)" readonly>
+</div>
 
-    <button type="submit" class="btn btn-primary w-100">Confirm Trade</button>
-  </form>
+<!-- Action -->
+<div class="mb-3">
+  <select class="form-select"
+          name="action"
+          id="action"
+          data-bs-toggle="tooltip"
+          data-bs-placement="left"
+          data-bs-html="true"
+          required>
+    <option value="" disabled selected>Action</option>
+    <option value="buy">Buy</option>
+    <option value="sell">Sell</option>
+  </select>
+</div>
 
+<!-- Duration -->
+<div class="mb-3">
+  <select class="form-select"
+          name="duration"
+          id="duration"
+          data-bs-toggle="tooltip"
+          data-bs-placement="left"
+          data-bs-html="true"
+          required>
+    <option value="" disabled selected>Duration</option>
+    <option value="intraday">Intraday</option>
+    <option value="longterm">Long Term</option>
+  </select>
+</div>
+
+<!-- Order Type -->
+<div class="mb-3">
+  <select class="form-select"
+          name="order_type"
+          id="order_type"
+          data-bs-toggle="tooltip"
+          data-bs-placement="left"
+          data-bs-html="true"
+          required>
+    <option value="" disabled selected>Order Type</option>
+    <option value="market">Market</option>
+    <option value="limit">Limit</option>
+  </select>
+</div>
+
+<button type="button" class="btn btn-primary w-100" id="previewTradeBtn">Preview Trade</button>
   </form>
 </div>
 
 
+<!-- Trade Preview Modal -->
+<div class="modal fade" id="tradePreviewModal" tabindex="-1" aria-labelledby="tradePreviewLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="tradePreviewLabel">Confirm Trade</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Stock Symbol:</strong> <span id="previewSymbol"></span></p>
+        <p><strong>Stock Name:</strong> <span id="previewName"></span></p>
+        <p><strong>Quantity:</strong> <span id="previewQty"></span></p>
+        <p><strong>Action:</strong> <span id="previewAction"></span></p>
+        <p><strong>Total Price:</strong> $<span id="previewTotal"></span></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Edit</button>
+        <button type="button" class="btn btn-primary" id="confirmTrade">Confirm Trade</button>
+      </div>
+    </div>
+  </div>
+</div>
 
+
+<script>
+  // Wait until the DOM is fully loaded
+  document.addEventListener("DOMContentLoaded", function () {
+    // Tooltip content for each select element
+    const tooltips = {
+      action: `<b>📈 Buy</b> to purchase stock<br><b>💰 Sell</b> to offload your holdings`,
+      duration: `<b>⏱️ Intraday</b>: same-day trading<br><b>📈 Long Term</b>: hold for multiple days`,
+      order_type: `<b>📦 Market</b>: trade at current price<br><b>🎯 Limit</b>: set your own price`
+    };
+
+    // Apply tooltip HTML content
+    for (const id in tooltips) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.setAttribute('data-bs-title', tooltips[id]);
+      }
+    }
+
+    // Initialize Bootstrap tooltips
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    tooltipTriggerList.forEach(el => new bootstrap.Tooltip(el));
+  });
+</script>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
@@ -134,4 +202,41 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 </script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const previewBtn = document.getElementById('previewTradeBtn');
+  const confirmBtn = document.getElementById('confirmTrade');
+  const form = document.getElementById('tradeForm');
+
+  previewBtn.addEventListener('click', () => {
+    const symbol = document.getElementById('stockSymbol').value.toUpperCase();
+    const name = document.getElementById('stockName').value;
+    const qty = document.getElementById('qty').value;
+    const action = document.getElementById('action').value;
+    const total = document.getElementById('totalPrice').value;
+
+    if (!symbol || !qty || !action || !total) {
+      alert('Please fill all required fields first.');
+      return;
+    }
+
+    // Populate modal
+    document.getElementById('previewSymbol').textContent = symbol;
+    document.getElementById('previewName').textContent = name;
+    document.getElementById('previewQty').textContent = qty;
+    document.getElementById('previewAction').textContent = action.charAt(0).toUpperCase() + action.slice(1);
+    document.getElementById('previewTotal').textContent = total;
+
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('tradePreviewModal'));
+    modal.show();
+  });
+
+  confirmBtn.addEventListener('click', () => {
+    form.submit();
+  });
+});
+</script>
+
 {% endblock %}
