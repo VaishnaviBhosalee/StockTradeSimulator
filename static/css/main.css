@@ -71,17 +71,20 @@ body {
   padding: 20px;
   background-color: #f1f4fb;
   border-left: 5px solid #003366;
+  border-top: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
   border-radius: 8px;
   margin-bottom: 20px;
   transition: box-shadow 0.3s ease;
 }
 
 .card {
-  background-color: #eef4ff;
+  background-color: #f1f4fb;
 }
 
 .research-card {
-  background-color: #f9fbff;
+  background-color: #f1f4fb;
   border: 1px solid #cde0f8;
   text-align: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
@@ -89,6 +92,7 @@ body {
 
 .card:hover,
 .research-card:hover,
+.research-container:hover,
 .trade-container:hover {
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
 }
@@ -99,12 +103,17 @@ h1, h2, h3, h4 {
   margin-bottom: 12px;
 }
 
-.research-container h1 {
-  text-align: center;
-  font-size: 32px;
-  color: #003366;
-  margin-bottom: 30px;
-  font-weight: bold;
+.research-container{
+  padding: 20px;
+  background-color: #f1f4fb;
+  border-left: 5px solid #003366;
+  border-top: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  transition: box-shadow 0.3s ease;
+  overflow: hidden;
 }
 
 .research-card h2 {
@@ -173,10 +182,12 @@ h1, h2, h3, h4 {
   display: flex;
   justify-content: space-between;
   gap: 20px;
-  background-color: #ffffff;
+  background-color: #f1f4fb;
   color: #212529;
   padding: 20px 30px;
+  margin-bottom: 10px;
   border-radius: 10px;
+  border: 1px solid #ccc;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
@@ -213,13 +224,18 @@ h1, h2, h3, h4 {
 
 /* Trade Container */
 .trade-container {
-  background-color: #ffffff;
-  border-radius: 12px;
   padding: 30px;
+  background-color: #f1f4fb;
+  border-left: 5px solid #003366;
+  border-top: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  border-radius: 8px;
   max-width: 800px;
   margin: auto;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  border: 1px solid #e0e0e0;
+  margin-bottom: 30px;
+  transition: box-shadow 0.3s ease;
+  overflow: hidden;
 }
 
 .trade-container h2 {
@@ -353,9 +369,9 @@ button {
 
 /* ─────────────── Tooltip Custom Styling ─────────────── */
 .tooltip-inner {
-  background-color: #2e77c0 !important; /* Dark background */
-  color: #fff !important;               /* White text */
-  font-size: 0.95rem;                   /* Slightly larger text */
+  background-color: #2e77c0 !important;
+  color: #fff !important;              
+  font-size: 0.95rem;                   
   padding: 8px 12px;
   border-radius: 6px;
   max-width: 250px;

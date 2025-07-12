@@ -17,9 +17,16 @@
   <!-- Embedded style for navbar -->
   <style>
     .navbar {
+      position: fixed;
+      top: 0;     
+      left: 0;    
+      right: 0;   
+      width: 100%;
+      z-index: 1000;
       background-color: #f8f9fa;
-      padding: 10px 20px;
+      padding: 20px 0px 20px 0px;
       border-bottom: 1px solid #ccc;
+      box-sizing: border-box;
     }
 
     .navbar .container-fluid {
@@ -89,7 +96,7 @@
       
       {% if login_success %}
         <div class="navbar-left">
-          <h4><i>Welcome, {{ user_name }} </i></h4>
+          <h4>Welcome, {{ user_name }}</h4>
         </div>
 
         <div class="navbar-center">
